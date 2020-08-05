@@ -1,0 +1,58 @@
+<idea-plugin>
+    <id>top.totoro.plugin.SwingPro</id>
+    <name>SwingPro</name>
+    <version>1.0</version>
+    <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
+
+    <description>快速创建SwingPro桌面应用</description>
+
+    <change-notes>v1.0.1 提供创建一个完整项目的必备功能</change-notes>
+
+    <idea-version since-build="193.0"/>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+<!--    <applicationListeners>-->
+<!--        <listener class="top.totoro.plugin.file.SwingProjectOpenListener"-->
+<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
+<!--        &lt;!&ndash;        <listener class="top.totoro.plugin.file.SwingModuleListener"&ndash;&gt;-->
+<!--        &lt;!&ndash;                  topic="com.intellij.openapi.project.ModuleListener"/>&ndash;&gt;-->
+<!--    </applicationListeners>-->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!--        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"-->
+        <!--                  fieldName="INSTANCE" language="Swing" extensions="xml"/>-->
+        <fileType name="Swing File" implementationClass="top.totoro.plugin.test.SimpleFileType"
+                  fieldName="INSTANCE" language="Simple" extensions="swing"/>
+        <lang.parserDefinition language="Simple"
+                               implementationClass="top.totoro.plugin.test.SimpleParserDefinition"/>
+        <lang.parserDefinition language="JAVA"
+                               implementationClass="top.totoro.plugin.test.RIDParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Simple"
+                                       implementationClass="top.totoro.plugin.test.SimpleSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="top.totoro.plugin.test.SimpleColorSettingsPage"/>
+        <!--        <annotator language="JAVA" implementationClass="top.totoro.plugin.test.SimpleAnnotator"/>-->
+        <codeInsight.lineMarkerProvider language="Simple"
+                                        implementationClass="top.totoro.plugin.test.SimpleLineMarkerProvider"/>
+        <completion.contributor language="Simple"
+                                implementationClass="top.totoro.plugin.test.SimpleCompletionContributor"/>
+        <psi.referenceContributor implementation="top.totoro.plugin.test.SimpleReferenceContributor"/>
+        <lang.refactoringSupport language="Simple"
+                                 implementationClass="top.totoro.plugin.test.SimpleRefactoringSupportProvider"/>
+        <lang.findUsagesProvider language="Simple"
+                                 implementationClass="top.totoro.plugin.test.SimpleFindUsagesProvider"/>
+    </extensions>
+
+    <actions>
+        <action class="top.totoro.plugin.action.NewSwingProjectAction"
+                id="top.totoro.plugin.action.NewSwingProjectAction" text="新建Swing项目">
+            <add-to-group group-id="NewGroup" anchor="first"/>
+        </action>
+        <group id="top.totoro.plugin.action.SwingProGroup" class="top.totoro.plugin.action.SwingProGroup" popup="true"
+               text="SwingPro" description="Custom defaultActionGroup demo">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+        </group>
+    </actions>
+
+</idea-plugin>
