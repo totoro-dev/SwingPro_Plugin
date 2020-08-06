@@ -1,13 +1,13 @@
 package top.totoro.plugin.file;
 
+import com.intellij.openapi.ui.Messages;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Swing中所有资源文件的整合
@@ -19,7 +19,9 @@ public class SwingResGroupCreator {
             File.separator + "java" +
             File.separator + "swing" +
             File.separator + "R.java";
-    private static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\npublic class R{\n\n}";
+    private static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\n" +
+            "// 系统自动生成的代码，请不要做任何修改" +
+            "public class R{\n\n}";
 
     private static final String idClassStart = "\tpublic static class id {\n";
     private static final String idClassStartRegex = "\tpublic static class id \\{\n";
@@ -44,11 +46,13 @@ public class SwingResGroupCreator {
         String resParentName = resParent.getName();
         switch (resParentName) {
             case "layout":
+                Log.d(TAG, "createResGroup() is layout");
                 List<File> resFiles = resFilesMap.computeIfAbsent(projectPath, key -> new ArrayList<>());
-                if (!resFiles.contains(res)) {
-                    resFiles.add(res);
-                    createLayoutGroup(projectPath, res);
-                }
+                File[] layoutFiles = resParent.listFiles();
+                if (layoutFiles == null) break;
+                resFiles.clear();
+                resFiles.addAll(Arrays.asList(layoutFiles));
+                createLayoutGroup(projectPath, resFiles);
                 createIdGroup(projectPath, res, content);
                 break;
             case "values":
@@ -56,40 +60,34 @@ public class SwingResGroupCreator {
         }
     }
 
-    private static void createLayoutGroup(String projectPath, File res) {
+    private static void createLayoutGroup(String projectPath, List<File> layoutFiles) {
+        Log.d(TAG, "createLayoutGroup() layout file size = " + layoutFiles.size());
         try {
             // 确定R.java文件已生成
             File RFile = checkRFileCreated(projectPath);
             if (RFile.exists()) {
                 String originRFileContents = getRFileContent(RFile);
                 StringBuilder finalContents = new StringBuilder(originRFileContents);
-                List<File> layoutFiles = resFilesMap.computeIfAbsent(projectPath, key -> new ArrayList<>());
                 String[] totals = originRFileContents.split(layoutClassStartRegex);
                 if (totals.length == 1) {
                     finalContents = new StringBuilder(totals[0].substring(0, totals[0].lastIndexOf("}")));
                     finalContents.append(layoutClassStart);
-                    StringBuilder finalContents1 = finalContents;
                     for (File layoutFile : layoutFiles) {
                         String fileName = layoutFile.getName();
-                        finalContents1.append(layoutFieldStart)
-                                .append(fileName, 0, fileName.lastIndexOf("."))
-                                .append("=\"").append(fileName).append("\";\n");
+                        String field = layoutFieldStart + fileName.substring(0, fileName.lastIndexOf(".")) + "=\"" + fileName + "\";\n";
+                        finalContents.append(field);
                     }
-                    finalContents1.append("\t}\n}");
-                    finalContents = finalContents1;
+                    finalContents.append("\t}\n}");
                 } else if (totals.length == 2) {
                     finalContents = new StringBuilder(totals[0]);
                     String anotherContent = totals[1].substring(totals[1].indexOf("}\n") + 2);
                     finalContents.append(layoutClassStart);
-                    StringBuilder finalContents1 = finalContents;
                     for (File layoutFile : layoutFiles) {
                         String fileName = layoutFile.getName();
-                        finalContents1.append(layoutFieldStart)
-                                .append(fileName, 0, fileName.lastIndexOf("."))
-                                .append("=\"").append(fileName).append("\";\n");
+                        String field = layoutFieldStart + fileName.substring(0, fileName.lastIndexOf(".")) + "=\"" + fileName + "\";\n";
+                        finalContents.append(field);
                     }
-                    finalContents1.append("\t}\n");
-                    finalContents = finalContents1.append(anotherContent);
+                    finalContents.append("\t}\n").append(anotherContent);
                 }
                 if (finalContents.toString().equals(originRFileContents)) return;
                 setRFileContent(RFile, finalContents.toString());
@@ -106,6 +104,7 @@ public class SwingResGroupCreator {
             File RFile = checkRFileCreated(projectPath);
             if (RFile.exists()) {
                 String[] ids = resFileContent.split("id *= *\"");
+                // 提取所有的id值
                 String[] finalIds = new String[0];
                 if (ids.length > 0) {
                     finalIds = new String[ids.length - 1];
@@ -113,11 +112,21 @@ public class SwingResGroupCreator {
                         finalIds[i - 1] = ids[i].substring(0, ids[i].indexOf("\""));
                     }
                 }
+                // R.java文件中原始的内容
                 String originRFileContents = getRFileContent(RFile);
+                // 最终的R.java文件的内容
                 StringBuilder finalContents = new StringBuilder(originRFileContents);
                 Map<File, List<String>> idInFileMap = idInRFilesMap.computeIfAbsent(RFile, key -> new ConcurrentHashMap<>());
-                List<String> originFileIds = new ArrayList<>(Arrays.asList(finalIds));
-                idInFileMap.put(res, originFileIds.stream().distinct().collect(Collectors.toList()));
+                // 当前资源文件中的id值
+                List<String> idsInResFile = new ArrayList<>();
+                for (String finalId : finalIds) {
+                    if (idsInResFile.contains(finalId)) {
+                        Messages.showErrorDialog(finalId + "重复定义", "ID错误");
+                    } else {
+                        idsInResFile.add(finalId);
+                    }
+                }
+                idInFileMap.put(res, idsInResFile);
                 // 处理加入的id
                 String[] totals = originRFileContents.split(idClassStartRegex);
                 if (totals.length == 1) {
@@ -138,8 +147,11 @@ public class SwingResGroupCreator {
                     finalContents.append(idClassStart);
                     String anotherContent = totals[1].substring(totals[1].indexOf("}\n") + 2);
                     StringBuilder finalContents1 = finalContents;
+                    List<String> distinctIds = new ArrayList<>();
                     idInFileMap.forEach((file, idList) -> {
                         for (String id : idList) {
+                            if (distinctIds.contains(id)) continue;
+                            distinctIds.add(id);
                             finalContents1.append(idFieldStart)
                                     .append(id).append("=\"")
                                     .append(id).append("\";\n");
