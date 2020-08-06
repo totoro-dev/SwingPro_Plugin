@@ -47,6 +47,16 @@ public class Constants {
             "                text=\"Hello World\"/>\n" +
             "</LinearLayout>";
 
+    public static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\n" +
+            "//\n" +
+            "// Source code created by IntelliJ IDEA, don't redefine anyway!\n" +
+            "// (powered by SwingPro Plugin)\n" +
+            "//"+
+            "\n\n" +
+            "public final class R{\n" +
+            "    \n" +
+            "}";
+
     public static final String DEFAULT_MAIN_ACTIVITY_CONTENT = "package ui;\n" +
             "\n" +
             "import swing.R;\n" +
@@ -88,7 +98,7 @@ public class Constants {
             "        <dependency>\n" +
             "            <groupId>io.github.totoro-dev</groupId>\n" +
             "            <artifactId>SwingPro</artifactId>\n" +
-            "            <version>1.0.1</version>\n" +
+            "            <version>1.0.2</version>\n" +
             "        </dependency>\n" +
             "    </dependencies>\n";
 }

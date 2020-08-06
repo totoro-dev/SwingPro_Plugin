@@ -3,11 +3,14 @@ package top.totoro.plugin.file;
 import com.intellij.openapi.ui.Messages;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static top.totoro.plugin.constant.Constants.DEFAULT_R_FILE_CONTENT;
 
 /**
  * Swing中所有资源文件的整合
@@ -19,9 +22,6 @@ public class SwingResGroupCreator {
             File.separator + "java" +
             File.separator + "swing" +
             File.separator + "R.java";
-    private static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\n" +
-            "// 系统自动生成的代码，请不要做任何修改" +
-            "public class R{\n\n}";
 
     private static final String idClassStart = "\tpublic static class id {\n";
     private static final String idClassStartRegex = "\tpublic static class id \\{\n";
@@ -183,6 +183,7 @@ public class SwingResGroupCreator {
             if (mkdirs) {
                 if (!RFile.exists()) {
                     Log.d(TAG, "create R file " + (RFile.createNewFile() ? "success" : "false"));
+                    setRFileContent(RFile, DEFAULT_R_FILE_CONTENT);
                 }
             } else {
                 Log.d(TAG, "mkdirs " + RFile.getParentFile().getPath() + " false");
@@ -208,11 +209,15 @@ public class SwingResGroupCreator {
             e.printStackTrace();
         }
         if (content.length() == 0) {
-            // 没有内容，返回初始化R.java
+            // 没有内容，返回初始化R.java// 系统自动生成的代码，请不要做任何修改
             return DEFAULT_R_FILE_CONTENT;
         }
         return content.toString();
     }
+
+public static final class R{
+
+}
 
     /**
      * 将最终的R.java文件内容写入文件中
@@ -221,8 +226,11 @@ public class SwingResGroupCreator {
      * @param content 文件内容
      */
     private static void setRFileContent(File RFile, String content) {
-        try (FileWriter fileWriter = new FileWriter(RFile, false)) {
-            fileWriter.write(content);
+        try {
+            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(RFile), StandardCharsets.UTF_8);
+            osw.write(content);
+            osw.flush();
+            osw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
