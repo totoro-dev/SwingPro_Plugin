@@ -71,13 +71,11 @@ public class SimpleFileType extends LanguageFileType {
                 // 开始创建或更新资源组，同步修改到R.java中
                 SwingResGroupCreator.createResGroup(modulePath, new File(swingFilePath), content.toString());
                 // 刷新项目，确保修改能第一时间被感应
-//                try {
-//                    SwingUtilities.invokeAndWait(()->{
-//                        project.getBaseDir().refresh(false, true);
-//                    });
-//                } catch (InterruptedException | InvocationTargetException e) {
-//                    e.printStackTrace();
-//                }
+                VirtualFile srcFile = virtualFile.getParent();
+                while (srcFile != null && !srcFile.getPath().endsWith("src")) {
+                    srcFile = srcFile.getParent();
+                }
+                Objects.requireNonNull(srcFile).refresh(true, true);
             }
         }
         return super.extractCharsetFromFileContent(project, virtualFile, content);

@@ -215,10 +215,6 @@ public class SwingResGroupCreator {
         return content.toString();
     }
 
-public static final class R{
-
-}
-
     /**
      * 将最终的R.java文件内容写入文件中
      *
