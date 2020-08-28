@@ -18,7 +18,7 @@ public class SwingProGroup extends DefaultActionGroup {
 
     public SwingProGroup() {
         add(NEW_SWING_PROJECT_ACTION);
-//        add(NEW_SWING_MODULE_ACTION);
+        add(NEW_SWING_MODULE_ACTION);
         add(NEW_ACTIVITY_FILE_ACTION);
         add(NEW_SWING_FILE_ACTION);
     }

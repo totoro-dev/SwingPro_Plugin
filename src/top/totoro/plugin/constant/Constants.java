@@ -36,16 +36,27 @@ public class Constants {
             "\n" +
             "</LinearLayout>";
 
-    public static final String NEW_SWING_FILE_CONTENT = SWING_FILE_HEADER + "<LinearLayout\n" +
+    public static final String NEW_SWING_FILE_CONTENT = SWING_FILE_HEADER +
+            "<LinearLayout\n" +
+            "    width=\"match_parent\"\n" +
+            "    height=\"match_parent\"\n" +
+            "    orientation=\"vertical\">\n" +
+            "    <TextView\n" +
             "        width=\"match_parent\"\n" +
             "        height=\"match_parent\"\n" +
-            "        orientation=\"vertical\">\n" +
-            "        <TextView\n" +
-            "                width=\"match_parent\"\n" +
-            "                height=\"match_parent\"\n" +
-            "                textColor=\"#515151\"\n" +
-            "                text=\"Hello World\"/>\n" +
+            "        textColor=\"#515151\"\n" +
+            "        text=\"Hello World\"/>\n" +
             "</LinearLayout>";
+
+    public static final String DEFAULT_STYLES_FILE_CONTENT = SWING_FILE_HEADER +
+            "<resource>\n" +
+            "    <default>\n" +
+            "        <item name=\"backgroundColor\">#ffffff</item>\n" +
+            "        <item name=\"borderColor\">#dbdbdb</item>\n" +
+            "        <item name=\"themeColor\">#15a5e5</item>\n" +
+            "        <item name=\"appIcon\">img/swing_logo.png</item>\n" +
+            "    </default>\n" +
+            "</resource>";
 
     public static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\n" +
             "//\n" +
@@ -98,7 +109,7 @@ public class Constants {
             "        <dependency>\n" +
             "            <groupId>io.github.totoro-dev</groupId>\n" +
             "            <artifactId>SwingPro</artifactId>\n" +
-            "            <version>1.0.2</version>\n" +
+            "            <version>1.0.3</version>\n" +
             "        </dependency>\n" +
             "    </dependencies>\n";
 }

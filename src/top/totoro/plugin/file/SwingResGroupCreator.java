@@ -222,11 +222,9 @@ public class SwingResGroupCreator {
      * @param content 文件内容
      */
     private static void setRFileContent(File RFile, String content) {
-        try {
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(RFile), StandardCharsets.UTF_8);
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(RFile), StandardCharsets.UTF_8)) {
             osw.write(content);
             osw.flush();
-            osw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

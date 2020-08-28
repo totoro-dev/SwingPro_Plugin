@@ -1,5 +1,6 @@
 package top.totoro.plugin.action;
 
+import com.intellij.ide.actions.NewProjectAction;
 import com.intellij.ide.util.newProjectWizard.AbstractProjectWizard;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ProjectBuilder;
@@ -14,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.totoro.plugin.file.Log;
+import top.totoro.plugin.file.SwingProjectInitializer;
 import top.totoro.plugin.file.SwingResGroupCreator;
 import top.totoro.plugin.ui.NewSwingModuleWrapper;
 
@@ -47,7 +49,6 @@ public class NewSwingModuleAction extends NewModuleAction {
             defaultPath = virtualFile.getPath();
         }
         NewSwingModuleWrapper wizard = new NewSwingModuleWrapper(project, new DefaultModulesProvider(project), defaultPath);
-        wizard.setRootFile(virtualFile);
 
         Log.d(TAG, "actionPerformed start");
         if (wizard.showAndGet()) {
@@ -67,7 +68,10 @@ public class NewSwingModuleAction extends NewModuleAction {
             module = ((ModuleBuilder) builder).commitModule(project, null);
             if (module != null) {
                 processCreatedModule(module, dataFromContext);
-                createSwingProjectFiles(module);
+                String projectPath = module.getModuleFilePath().substring(0, module.getModuleFilePath().lastIndexOf("/"));
+                SwingProjectInitializer.createSwingProjectFiles(projectPath);
+                // 刷新目录
+                virtualFile.refresh(false, true);
             }
             return module;
         } else {
@@ -80,74 +84,6 @@ public class NewSwingModuleAction extends NewModuleAction {
         }
         project.save();
         return module;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void createSwingProjectFiles(Module module) {
-        String modulePath = module.getModuleFilePath().substring(0, module.getModuleFilePath().lastIndexOf("/"));
-        /************** 生成资源文件 *****************/
-        String resPath = modulePath + "/src/main/resources";
-        File resDir = new File(resPath);
-        Log.d(this, "resPath : " + resPath);
-        if (!resDir.exists()) {
-            Log.d(this, "! resDir.exists()");
-            resDir.mkdirs();
-        }
-        File layoutDir = new File(resDir + "/layout");
-        File mipmapDir = new File(resDir + "/mipmap");
-        File valuesDir = new File(resDir + "/values");
-        File main_activity = new File(layoutDir.getPath() + "/activity_main.swing");
-        try {
-            layoutDir.mkdirs();
-            mipmapDir.mkdirs();
-            valuesDir.mkdirs();
-            main_activity.createNewFile();
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(main_activity), StandardCharsets.UTF_8);
-            osw.write(DEFAULT_SWING_FILE_CONTENT);
-            osw.flush();
-            osw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /************** 生成Java文件 *****************/
-        String javaPath = modulePath + "/src/main/java";
-        File javaDir = new File(javaPath + "/ui");
-        Log.d(this, "javaPath : " + javaPath);
-        if (!javaDir.exists()) {
-            Log.d(this, "! javaDir.exists()");
-            javaDir.mkdirs();
-        }
-        File MainActivity = new File(javaPath + "/ui/MainActivity.java");
-        try {
-            MainActivity.createNewFile();
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(MainActivity), StandardCharsets.UTF_8);
-            osw.write(DEFAULT_MAIN_ACTIVITY_CONTENT);
-            osw.flush();
-            osw.close();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-        SwingResGroupCreator.createResGroup(modulePath, main_activity, DEFAULT_SWING_FILE_CONTENT);
-        /************** 添加SwingPro的依赖 *****************/
-        File pomFile = new File(modulePath + "/pom.xml");
-        String pomContent = "";
-        StringBuilder content = new StringBuilder();
-        try (FileReader fr = new FileReader(pomFile); BufferedReader br = new BufferedReader(fr)) {
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            content.insert(content.lastIndexOf("</project>"),DEPENDENCY);
-            pomContent = content.toString();
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(pomFile), StandardCharsets.UTF_8);
-            osw.write(pomContent);
-            osw.flush();
-            osw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        // 刷新目录
-        virtualFile.refresh(false, true);
     }
 
     @Override

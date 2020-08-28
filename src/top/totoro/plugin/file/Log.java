@@ -43,7 +43,7 @@ public class Log {
         String tag = "DEFAULT-TAG";
         if (tagObj instanceof String) {
             tag = (String) tagObj;
-        } else if (!(tagObj instanceof Class)) {
+        } else {
             tag = tagObj.getClass().getSimpleName();
         }
         System.out.printf("%s\t%s ----- %s : %s\n", format.format(new Date()), level, tag, msg);
