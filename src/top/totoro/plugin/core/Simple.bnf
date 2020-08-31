@@ -1,0 +1,26 @@
+{
+  parserClass="top.totoro.plugin.core.SimpleParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Simple"
+  psiImplClassSuffix="Impl"
+  psiPackage="top.totoro.plugin.core"
+  psiImplPackage="top.totoro.plugin.core.impl"
+
+  elementTypeHolderClass="top.totoro.plugin.core.SimpleTypes"
+  elementTypeClass="top.totoro.plugin.core.SimpleElementType"
+  tokenTypeClass="top.totoro.plugin.core.SimpleTokenType"
+
+  psiImplUtilClass="top.totoro.plugin.core.SimplePsiImplUtil"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF|TAG)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY {
+  mixin="top.totoro.plugin.core.SimpleNamedElementImpl"
+  implements="top.totoro.plugin.core.SimpleNamedElement"
+  methods=[getKey getValue getName setName getNameIdentifier]
+}

@@ -1,0 +1,26 @@
+{
+  parserClass="top.totoro.plugin.core.RIDParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="RID"
+  psiImplClassSuffix="Impl"
+  psiPackage="top.totoro.plugin.core"
+  psiImplPackage="top.totoro.plugin.core.impl"
+
+  elementTypeHolderClass="top.totoro.plugin.core.RIDTypes"
+  elementTypeClass="top.totoro.plugin.core.RIDElementType"
+  tokenTypeClass="top.totoro.plugin.core.RIDTokenType"
+
+  psiImplUtilClass="top.totoro.plugin.core.RIDPsiImplUtil"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY {
+  mixin="top.totoro.plugin.core.RIDNamedElementImpl"
+  implements="top.totoro.plugin.core.RIDNamedElement"
+  methods=[getKey getValue getName setName getNameIdentifier]
+}

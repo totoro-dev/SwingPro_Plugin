@@ -24,25 +24,25 @@
     <extensions defaultExtensionNs="com.intellij">
         <!--        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"-->
         <!--                  fieldName="INSTANCE" language="Swing" extensions="xml"/>-->
-        <fileType name="Swing File" implementationClass="top.totoro.plugin.test.SimpleFileType"
+        <fileType name="Swing File" implementationClass="top.totoro.plugin.core.SimpleFileType"
                   fieldName="INSTANCE" language="Simple" extensions="swing"/>
         <lang.parserDefinition language="Simple"
-                               implementationClass="top.totoro.plugin.test.SimpleParserDefinition"/>
+                               implementationClass="top.totoro.plugin.core.SimpleParserDefinition"/>
         <lang.parserDefinition language="JAVA"
-                               implementationClass="top.totoro.plugin.test.RIDParserDefinition"/>
+                               implementationClass="top.totoro.plugin.core.RIDParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Simple"
-                                       implementationClass="top.totoro.plugin.test.SimpleSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="top.totoro.plugin.test.SimpleColorSettingsPage"/>
+                                       implementationClass="top.totoro.plugin.core.SimpleSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="top.totoro.plugin.core.SimpleColorSettingsPage"/>
         <!--        <annotator language="JAVA" implementationClass="top.totoro.plugin.test.SimpleAnnotator"/>-->
         <codeInsight.lineMarkerProvider language="Simple"
-                                        implementationClass="top.totoro.plugin.test.SimpleLineMarkerProvider"/>
+                                        implementationClass="top.totoro.plugin.core.SimpleLineMarkerProvider"/>
         <completion.contributor language="Simple"
-                                implementationClass="top.totoro.plugin.test.SimpleCompletionContributor"/>
-        <psi.referenceContributor implementation="top.totoro.plugin.test.SimpleReferenceContributor"/>
+                                implementationClass="top.totoro.plugin.core.SimpleCompletionContributor"/>
+        <psi.referenceContributor implementation="top.totoro.plugin.core.SimpleReferenceContributor"/>
         <lang.refactoringSupport language="Simple"
-                                 implementationClass="top.totoro.plugin.test.SimpleRefactoringSupportProvider"/>
+                                 implementationClass="top.totoro.plugin.core.SimpleRefactoringSupportProvider"/>
         <lang.findUsagesProvider language="Simple"
-                                 implementationClass="top.totoro.plugin.test.SimpleFindUsagesProvider"/>
+                                 implementationClass="top.totoro.plugin.core.SimpleFindUsagesProvider"/>
     </extensions>
 
     <actions>
