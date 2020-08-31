@@ -4,58 +4,58 @@ public class Constants {
     public static final String SWING_FILE_HEADER = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
     public static final String DEFAULT_SWING_FILE_CONTENT = SWING_FILE_HEADER +
             "<LinearLayout\n" +
-            "    id=\"main_linear_layout\"\n" +
-            "    width=\"match_parent\"\n" +
-            "    height=\"match_parent\"\n" +
-            "    orientation=\"vertical\">\n" +
-            "    <TextView\n" +
-            "        width=\"match_parent\"\n" +
-            "        height=\"match_parent\"\n" +
-            "        background=\"#15a5e5\"\n" +
-            "        textColor=\"#eeeeee\"\n" +
-            "        text=\"Hello World\"\n" +
-            "        id=\"tv_test\"/>\n" +
-            "    <CenterLayout\n" +
-            "        width=\"match_parent\"\n" +
-            "        height=\"match_parent\"\n" +
-            "        orientation=\"vertical\">\n" +
-            "        <CenterLayout\n" +
-            "            width=\"match_parent\"\n" +
-            "            height=\"wrap_content\"\n" +
-            "            orientation=\"horizontal\">\n" +
-            "        <Button\n" +
-            "            width=\"wrap_content\"\n" +
-            "            height=\"wrap_content\"\n" +
-            "            background=\"#15a5e5\"\n" +
-            "            textColor=\"#ffffff\"\n" +
-            "            textSize=\"14\"\n" +
-            "            text=\"跳转页面\"\n" +
-            "            id=\"btn_test\"/>\n" +
-            "        </CenterLayout>\n" +
-            "    </CenterLayout>\n" +
+            "\tid=\"main_linear_layout\"\n" +
+            "\twidth=\"match_parent\"\n" +
+            "\theight=\"match_parent\"\n" +
+            "\torientation=\"vertical\">\n" +
+            "\t<TextView\n" +
+            "\t\twidth=\"match_parent\"\n" +
+            "\t\theight=\"match_parent\"\n" +
+            "\t\tbackground=\"#15a5e5\"\n" +
+            "\t\ttextColor=\"#eeeeee\"\n" +
+            "\t\ttext=\"Hello World\"\n" +
+            "\t\tid=\"tv_test\"/>\n" +
+            "\t<CenterLayout\n" +
+            "\t\twidth=\"match_parent\"\n" +
+            "\t\theight=\"match_parent\"\n" +
+            "\t\torientation=\"vertical\">\n" +
+            "\t\t<CenterLayout\n" +
+            " \t\t\twidth=\"match_parent\"\n" +
+            "\t\t\theight=\"wrap_content\"\n" +
+            "\t\t\torientation=\"horizontal\">\n" +
+            "\t\t<Button\n" +
+            "\t\t\twidth=\"wrap_content\"\n" +
+            "\t\t\theight=\"wrap_content\"\n" +
+            "\t\t\tbackground=\"#15a5e5\"\n" +
+            "\t\t\ttextColor=\"#ffffff\"\n" +
+            "\t\t\ttextSize=\"14\"\n" +
+            "\t\t\ttext=\"跳转页面\"\n" +
+            "\t\t\tid=\"btn_test\"/>\n" +
+            "\t\t</CenterLayout>\n" +
+            "\t</CenterLayout>\n" +
             "\n" +
             "</LinearLayout>";
 
     public static final String NEW_SWING_FILE_CONTENT = SWING_FILE_HEADER +
             "<LinearLayout\n" +
-            "    width=\"match_parent\"\n" +
-            "    height=\"match_parent\"\n" +
-            "    orientation=\"vertical\">\n" +
-            "    <TextView\n" +
-            "        width=\"match_parent\"\n" +
-            "        height=\"match_parent\"\n" +
-            "        textColor=\"#515151\"\n" +
-            "        text=\"Hello World\"/>\n" +
+            "\twidth=\"match_parent\"\n" +
+            "\theight=\"match_parent\"\n" +
+            "\torientation=\"vertical\">\n" +
+            "\t<TextView\n" +
+            "\t\twidth=\"match_parent\"\n" +
+            "\t\theight=\"match_parent\"\n" +
+            "\t\ttextColor=\"#515151\"\n" +
+            "\t\ttext=\"Hello World\"/>\n" +
             "</LinearLayout>";
 
     public static final String DEFAULT_STYLES_FILE_CONTENT = SWING_FILE_HEADER +
             "<resource>\n" +
-            "    <default>\n" +
-            "        <item name=\"backgroundColor\">#ffffff</item>\n" +
-            "        <item name=\"borderColor\">#dbdbdb</item>\n" +
-            "        <item name=\"themeColor\">#15a5e5</item>\n" +
-            "        <item name=\"appIcon\">img/swing_logo.png</item>\n" +
-            "    </default>\n" +
+            "\t<default>\n" +
+            "\t\t<item name=\"backgroundColor\">#ffffff</item>\n" +
+            "\t\t<item name=\"borderColor\">#dbdbdb</item>\n" +
+            "\t\t<item name=\"themeColor\">#15a5e5</item>\n" +
+            "\t\t<item name=\"appIcon\">img/swing_logo.png</item>\n" +
+            "\t</default>\n" +
             "</resource>";
 
     public static final String DEFAULT_R_FILE_CONTENT = "package swing;\n\n" +
@@ -105,11 +105,11 @@ public class Constants {
             "    }\n" +
             "}\n";
 
-    public static final String DEPENDENCY = "    <dependencies>\n" +
-            "        <dependency>\n" +
-            "            <groupId>io.github.totoro-dev</groupId>\n" +
-            "            <artifactId>SwingPro</artifactId>\n" +
-            "            <version>1.0.3</version>\n" +
-            "        </dependency>\n" +
-            "    </dependencies>\n";
+    public static final String DEPENDENCY = "\t<dependencies>\n" +
+            "\t\t<dependency>\n" +
+            "\t\t\t<groupId>io.github.totoro-dev</groupId>\n" +
+            "\t\t\t<artifactId>SwingPro</artifactId>\n" +
+            "\t\t\t<version>1.0.3</version>\n" +
+            "\t\t</dependency>\n" +
+            "\t</dependencies>\n";
 }

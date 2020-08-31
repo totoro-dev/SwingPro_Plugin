@@ -9,6 +9,7 @@ public final class AttributeKey {
     public static final String ORIENTATION = "orientation";
 
     public static final String SRC = "src";
+    public static final String scaleType = "scaleType";
 
     public static final String START_X = "startX";
     public static final String START_Y = "startY";
@@ -17,6 +18,7 @@ public final class AttributeKey {
     public static final String HEIGHT = "height";
 
     public static final String VISIBLE = "visible";
+    public static final String OPAQUE = "opaque";
 
     public static final String TEXT = "text";
     public static final String TEXT_SIZE = "textSize";
@@ -34,5 +36,6 @@ public final class AttributeKey {
     public static final String switchOffKey = "switchOffIcon";
     public static final String isSwitchOnKey = "isSwitchOn";
 
+    public static final String GRAVITY = "gravity";
 
 }

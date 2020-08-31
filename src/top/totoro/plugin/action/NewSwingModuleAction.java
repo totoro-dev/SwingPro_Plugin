@@ -1,6 +1,5 @@
 package top.totoro.plugin.action;
 
-import com.intellij.ide.actions.NewProjectAction;
 import com.intellij.ide.util.newProjectWizard.AbstractProjectWizard;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ProjectBuilder;
@@ -16,14 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.totoro.plugin.file.Log;
 import top.totoro.plugin.file.SwingProjectInitializer;
-import top.totoro.plugin.file.SwingResGroupCreator;
 import top.totoro.plugin.ui.NewSwingModuleWrapper;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import static top.totoro.plugin.constant.Constants.*;
 
 public class NewSwingModuleAction extends NewModuleAction {
 

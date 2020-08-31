@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
@@ -17,97 +18,169 @@ import java.util.*;
 
 public class SimpleCompletionContributor extends CompletionContributor {
 
+    private static final String TAG = SimpleCompletionContributor.class.getSimpleName();
+
     static List<LookupElement> tagLookupElements = new LinkedList<>();
     static List<LookupElement> keyLookupElements = new LinkedList<>();
     static List<LookupElement> valueLookupElements = new LinkedList<>();
 
-    static {
-        tagLookupElements.add(LookupElementBuilder.create("LinearLayout"));
-        tagLookupElements.add(LookupElementBuilder.create("TextView"));
-        tagLookupElements.add(LookupElementBuilder.create("ImageView"));
-        tagLookupElements.add(LookupElementBuilder.create("ImageButton"));
-        tagLookupElements.add(LookupElementBuilder.create("Span"));
-        tagLookupElements.add(LookupElementBuilder.create("Spinner"));
-        tagLookupElements.add(LookupElementBuilder.create("SwitchButton"));
-        tagLookupElements.add(LookupElementBuilder.create("SwitchButton"));
+    static List<String> layoutTags = new LinkedList<>();
+    static List<String> viewTags = new LinkedList<>();
 
-        final InsertHandler<LookupElement> keyInsertHandler = (context, lookupElement) -> {
-            Log.d("SimpleCompletionContributor", "insert key width");
-            final Editor editor = context.getEditor();
-            final Document document = editor.getDocument();
-            int tailOffset = editor.getCaretModel().getOffset();
-            document.insertString(tailOffset, "=\"");
-            editor.getCaretModel().moveToOffset(tailOffset + 2);
-            tailOffset += 2;
-            LogicalPosition start = editor.offsetToLogicalPosition(tailOffset), end = null;
-            switch (lookupElement.getLookupString()) {
-                case AttributeKey.WIDTH:
-                case AttributeKey.HEIGHT:
-                    // 需要先插入默认内容，再获取内容的最后的位置LogicalPosition，得到的才是准确的位置
-                    document.insertString(tailOffset, AttributeDefaultValue.MATCH_PARENT + "\"");
-                    end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.MATCH_PARENT.length());
-                    break;
-                case AttributeKey.ORIENTATION:
-                    document.insertString(tailOffset, AttributeDefaultValue.HORIZONTAL + "\"");
-                    end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.HORIZONTAL.length());
-                    break;
-                case AttributeKey.SRC:
-                    document.insertString(tailOffset, "mipmap/" + "\"");
-                    editor.getCaretModel().moveToOffset(tailOffset + "mipmap/".length());
-                    // 不需要选中内容，直接返回
-                    return;
-                case AttributeKey.BACKGROUND:
-                    document.insertString(tailOffset, AttributeDefaultValue.WHITE_COLOR + "\"");
-                    // 将光标移动到#号之后
-                    editor.getCaretModel().moveToOffset(tailOffset + 1);
-                    // 背景颜色从#符号之后开始选中（数字部分）
-                    start = editor.offsetToLogicalPosition(tailOffset + 1);
-                    end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.WHITE_COLOR.length());
-                    break;
-            }
-            if (end == null) {
-                document.insertString(tailOffset, "\"");
-            } else {
-                Log.d("SimpleCompletionContributor", "line = " + start.line + " , column = " + start.column);
-                editor.getCaretModel().setCaretsAndSelections(Collections.singletonList(new CaretState(null, start, end)));
-            }
-        };
+    /* 标签对应的构建字段 */
+    static Map<String, List<LookupElement>> tagKeysMap = new HashMap<>();
+    /* 关键字段对应的值 */
+    static Map<String, List<LookupElement>> keyValuesMap = new HashMap<>();
+
+    static final InsertHandler<LookupElement> tagInsertHandler = (context, lookupElement) -> {
+        // add by HLM 确定当前的tag，自动填充width和height属性，同时自动关闭标签
+        String tag = lookupElement.getLookupString();
+        if (tag.startsWith("/")) return; // 闭合标签
+        Editor editor = context.getEditor();
+        Document document = editor.getDocument();
+        int tailOffset = editor.getCaretModel().getOffset();
+        String subString = document.getText().substring(0, tailOffset);
+        // 获取新增标签前面的空白内容，用于后面的自动填充
+        String whiteSpace = subString.substring(subString.lastIndexOf("\n") + 1, subString.lastIndexOf("<"));
+        // 自动填充的属性内容
+        String attrContent = "\n" +
+                whiteSpace + "\t" + AttributeKey.WIDTH + "=\"" + AttributeDefaultValue.MATCH_PARENT + "\"\n" +
+                whiteSpace + "\t" + AttributeKey.HEIGHT + "=\"" + AttributeDefaultValue.MATCH_PARENT + "\"";
+        document.insertString(tailOffset, attrContent);
+        tailOffset += attrContent.length(); // 增加自动填充属性内容的偏移
+        String closeElement; // 自动闭合标签的内容
+        if (layoutTags.contains(tag)) {
+            closeElement = ">\n" + whiteSpace + "\t" + "\n" + whiteSpace + "</" + tag + ">";
+            document.insertString(tailOffset, closeElement);
+            // 移动光标到新的行，使得可以直接添加新的标签节点
+            editor.getCaretModel().moveToOffset(tailOffset + 2 + whiteSpace.length() + "\t".length());
+        } else if (viewTags.contains(tag)) {
+            closeElement = "/>";
+            document.insertString(tailOffset, closeElement);
+            // 移动光标到所有属性的最后面，使得可以直接添加属性
+            editor.getCaretModel().moveToOffset(tailOffset);
+        }
+    };
+    static final InsertHandler<LookupElement> keyInsertHandler = (context, lookupElement) -> {
+        final Editor editor = context.getEditor();
+        final Document document = editor.getDocument();
+        int tailOffset = editor.getCaretModel().getOffset();
+        document.insertString(tailOffset, "=\"");
+        editor.getCaretModel().moveToOffset(tailOffset + 2);
+        tailOffset += 2;
+        LogicalPosition start = editor.offsetToLogicalPosition(tailOffset), end = null;
+        switch (lookupElement.getLookupString()) {
+            case AttributeKey.WIDTH:
+            case AttributeKey.HEIGHT:
+                // 需要先插入默认内容，再获取内容的最后的位置LogicalPosition，得到的才是准确的位置
+                document.insertString(tailOffset, AttributeDefaultValue.MATCH_PARENT + "\"");
+                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.MATCH_PARENT.length());
+                break;
+            case AttributeKey.ORIENTATION:
+                document.insertString(tailOffset, AttributeDefaultValue.HORIZONTAL + "\"");
+                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.HORIZONTAL.length());
+                break;
+            case AttributeKey.SRC:
+                document.insertString(tailOffset, "mipmap/" + "\"");
+                editor.getCaretModel().moveToOffset(tailOffset + "mipmap/".length());
+                // 不需要选中内容，直接返回
+                return;
+            case AttributeKey.BACKGROUND:
+                document.insertString(tailOffset, AttributeDefaultValue.WHITE_COLOR + "\"");
+                // 将光标移动到#号之后
+                editor.getCaretModel().moveToOffset(tailOffset + 1);
+                // 背景颜色从#符号之后开始选中（数字部分）
+                start = editor.offsetToLogicalPosition(tailOffset + 1);
+                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.WHITE_COLOR.length());
+                break;
+        }
+        if (end == null) {
+            document.insertString(tailOffset, "\"");
+        } else {
+            Log.d(TAG, "line = " + start.line + " , column = " + start.column);
+            editor.getCaretModel().setCaretsAndSelections(Collections.singletonList(new CaretState(null, start, end)));
+        }
+    };
+
+    static {
+        layoutTags.add("CenterLayout");
+        layoutTags.add("FrameLayout");
+        layoutTags.add("LinearLayout");
+        viewTags.add("Button");
+        viewTags.add("EditText");
+        viewTags.add("ImageButton");
+        viewTags.add("ImageView");
+        viewTags.add("RecyclerView");
+        viewTags.add("Span");
+        viewTags.add("Spinner");
+        viewTags.add("SwitchButton");
+        viewTags.add("TextView");
+        createTagLookElement();
+
+        createKeyLookupElement("CenterLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
+        createKeyLookupElement("FrameLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
+        createKeyLookupElement("LinearLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
+        createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
+                AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
+        createKeyLookupElement("EditText", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
+                AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR, AttributeKey.HINT_TEXT);
+        createKeyLookupElement("ImageButton", AttributeKey.SRC);
+        createKeyLookupElement("ImageView", AttributeKey.SRC, AttributeKey.scaleType);
+        createKeyLookupElement("RecyclerView");
+        createKeyLookupElement("Span");
+        createKeyLookupElement("Spinner", AttributeKey.arrayAttrKey, AttributeKey.selectedColorKey, AttributeKey.enterColorKey);
+        createKeyLookupElement("SwitchButton", AttributeKey.switchOnKey, AttributeKey.switchOffKey, AttributeKey.isSwitchOnKey);
+        createKeyLookupElement("TextView", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
+                AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
+
+        createValueLookupElement(AttributeKey.WIDTH, AttributeDefaultValue.MATCH_PARENT, AttributeDefaultValue.WRAP_CONTENT);
+        createValueLookupElement(AttributeKey.HEIGHT, AttributeDefaultValue.MATCH_PARENT, AttributeDefaultValue.WRAP_CONTENT);
+        createValueLookupElement(AttributeKey.ORIENTATION, AttributeDefaultValue.VERTICAL, AttributeDefaultValue.HORIZONTAL);
+        createValueLookupElement(AttributeKey.VISIBLE, AttributeDefaultValue.VISIBLE, AttributeDefaultValue.GONE);
+        createValueLookupElement(AttributeKey.OPAQUE, AttributeDefaultValue.OPAQUE, AttributeDefaultValue.NOT_OPAQUE);
+        createValueLookupElement(AttributeKey.TEXT_STYLE, AttributeDefaultValue.SERIF, AttributeDefaultValue.SANS_SERIF,
+                AttributeDefaultValue.DIALOG, AttributeDefaultValue.DIALOG_INPUT, AttributeDefaultValue.MONOSPACED);
+        createValueLookupElement(AttributeKey.TEXT_FONT, AttributeDefaultValue.PLAIN,
+                AttributeDefaultValue.BOLD, AttributeDefaultValue.ITALIC);
+        createValueLookupElement(AttributeKey.GRAVITY, AttributeDefaultValue.left, AttributeDefaultValue.right,
+                AttributeDefaultValue.top, AttributeDefaultValue.bottom, AttributeDefaultValue.center);
+        createValueLookupElement(AttributeKey.scaleType, AttributeDefaultValue.scaleFitCenter, AttributeDefaultValue.scaleCenter,
+                AttributeDefaultValue.scaleFitXY, AttributeDefaultValue.scaleFitStart, AttributeDefaultValue.scaleFitEnd);
+
+    }
+
+    private static void createTagLookElement() {
+        for (String layoutTag : layoutTags) {
+            tagLookupElements.add(LookupElementBuilder.create(layoutTag).withInsertHandler(tagInsertHandler));
+        }
+        for (String viewTag : viewTags) {
+            tagLookupElements.add(LookupElementBuilder.create(viewTag).withInsertHandler(tagInsertHandler));
+        }
+    }
+
+    // 根据不同的视图标签，创建当前视图可选的属性key
+    private static void createKeyLookupElement(String tag, String... keys) {
+        for (String key : keys) {
+            keyLookupElements.add(LookupElementBuilder.create(key).withInsertHandler(keyInsertHandler));
+        }
+        // 各种标签都具备的基本属性
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.ID).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.WIDTH).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.HEIGHT).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.ID).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.ORIENTATION).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.BACKGROUND).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.VISIBLE).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.SRC).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TEXT).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TEXT_SIZE).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TEXT_STYLE).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TEXT_FONT).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TEXT_COLOR).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.HINT_TEXT).withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("array").withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("selectedColor").withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("enterColor").withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("switchOnIcon").withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("switchOffIcon").withInsertHandler(keyInsertHandler));
-        keyLookupElements.add(LookupElementBuilder.create("isSwitchOn").withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.OPAQUE).withInsertHandler(keyInsertHandler));
+        tagKeysMap.put(tag, new LinkedList<>(keyLookupElements));
+        keyLookupElements.clear();
+    }
 
-        valueLookupElements.add(LookupElementBuilder.create("match_parent"));
-        valueLookupElements.add(LookupElementBuilder.create("wrap_content"));
-        valueLookupElements.add(LookupElementBuilder.create("horizontal"));
-        valueLookupElements.add(LookupElementBuilder.create("vertical"));
-        valueLookupElements.add(LookupElementBuilder.create("gone"));
-        valueLookupElements.add(LookupElementBuilder.create("visible"));
-        valueLookupElements.add(LookupElementBuilder.create("true"));
-        valueLookupElements.add(LookupElementBuilder.create("false"));
-        valueLookupElements.add(LookupElementBuilder.create("serif"));
-        valueLookupElements.add(LookupElementBuilder.create("sans_serif"));
-        valueLookupElements.add(LookupElementBuilder.create("dialog"));
-        valueLookupElements.add(LookupElementBuilder.create("dialog_input"));
-        valueLookupElements.add(LookupElementBuilder.create("monospaced"));
-        valueLookupElements.add(LookupElementBuilder.create("plain"));
-        valueLookupElements.add(LookupElementBuilder.create("bold"));
-        valueLookupElements.add(LookupElementBuilder.create("italic"));
+    // 根据键入的属性key，创建属性可选的值
+    private static void createValueLookupElement(String key, String... values) {
+        for (String value : values) {
+            valueLookupElements.add(LookupElementBuilder.create(value));
+        }
+        keyValuesMap.put(key, new LinkedList<>(valueLookupElements));
+        valueLookupElements.clear();
     }
 
     public SimpleCompletionContributor() {
@@ -117,6 +190,7 @@ public class SimpleCompletionContributor extends CompletionContributor {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                @NotNull ProcessingContext context,
                                                @NotNull CompletionResultSet resultSet) {
+                        Log.d(TAG, "completion as tag");
                         resultSet.addAllElements(tagLookupElements);
                     }
                 }
@@ -125,8 +199,22 @@ public class SimpleCompletionContributor extends CompletionContributor {
                 new CompletionProvider<CompletionParameters>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                @NotNull ProcessingContext context,
-                                               @NotNull CompletionResultSet result) {
-                        result.addAllElements(keyLookupElements);
+                                               @NotNull CompletionResultSet resultSet) {
+                        Log.d(TAG, "completion as key");
+                        // add by HLM 确定当前的tag，根据tag提示相应的key列表
+                        Editor editor = parameters.getEditor();
+                        Document document = editor.getDocument();
+                        int tailOffset = editor.getCaretModel().getOffset();
+                        String subString = document.getText().substring(0, tailOffset);
+                        subString = subString.substring(subString.lastIndexOf("<") + 1).trim();
+                        String tag = subString.substring(0, subString.indexOf("\n")).trim();
+                        if (tag.contains(" ")) {
+                            tag = tag.substring(0, tag.indexOf(" "));
+                        }
+                        Log.d(TAG, "tag = " + tag);
+                        keyLookupElements.clear();
+                        keyLookupElements.addAll(tagKeysMap.get(tag) == null ? Collections.emptyList() : tagKeysMap.get(tag));
+                        resultSet.addAllElements(keyLookupElements);
                     }
                 }
         );
@@ -135,10 +223,27 @@ public class SimpleCompletionContributor extends CompletionContributor {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                @NotNull ProcessingContext context,
                                                @NotNull CompletionResultSet resultSet) {
+                        Log.d(TAG, "completion as value");
+                        // add by HLM 确定当前行中的key，根据key提示相应的内容填充列表
+                        Editor editor = parameters.getEditor();
+                        Document document = editor.getDocument();
+                        int tailOffset = editor.getCaretModel().getOffset();
+                        String subString = document.getText().substring(0, tailOffset);
+                        String key = subString.substring(subString.lastIndexOf("\n"), subString.lastIndexOf("=")).trim();
+                        if (key.contains(" ")) {
+                            key = key.substring(key.lastIndexOf(" "));
+                        }
+                        Log.d(TAG, "key = " + key);
+                        valueLookupElements.clear();
+                        valueLookupElements.addAll(keyValuesMap.get(key) == null ? Collections.emptyList() : keyValuesMap.get(key));
                         resultSet.addAllElements(valueLookupElements);
                     }
                 }
         );
+    }
+
+    public static void editChanged() {
+
     }
 
     @Nullable
