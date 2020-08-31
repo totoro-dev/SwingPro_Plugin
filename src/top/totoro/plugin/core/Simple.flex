@@ -17,11 +17,12 @@ import com.intellij.psi.TokenType;
 CRLF=\R
 WHITE_SPACE=[\ \n\t\f]
 FIRST_VALUE_CHARACTER=[^= \n\f\\] | "\\"{CRLF} | "\\".
-VALUE_CHARACTER=[^\n\f\\>/] | "\\"{CRLF} | "\\".
-END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
+VALUE_CHARACTER=[^\n\f\\>] | "\\"{CRLF} | "\\".
+END_VALUE_CHARACTER=[^=]\"
+END_OF_LINE_COMMENT=("!")[^\r\n]*
 SEPARATOR=[=]
-KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
-TAG=[>] | "/">[\r\n\f] | " "*\t*<.*[\r\n\f>] | <\/
+KEY_CHARACTER=[^:=\ \n\t\f\\<>] | "\\ "
+TAG=<([^\s])*?[/>\s]|"/"?>[\s]?|>|<"/"[^\s]>
 
 %state WAITING_VALUE
 
@@ -39,7 +40,7 @@ TAG=[>] | "/">[\r\n\f] | " "*\t*<.*[\r\n\f>] | <\/
 
 <WAITING_VALUE> {WHITE_SPACE}+                              { yybegin(WAITING_VALUE); return TokenType.WHITE_SPACE; }
 
-<WAITING_VALUE> {FIRST_VALUE_CHARACTER}{VALUE_CHARACTER}*   { yybegin(YYINITIAL); return SimpleTypes.VALUE; }
+<WAITING_VALUE> {FIRST_VALUE_CHARACTER}{VALUE_CHARACTER}*{END_VALUE_CHARACTER}   { yybegin(YYINITIAL); return SimpleTypes.VALUE; }
 
 ({CRLF}|{WHITE_SPACE})+                                     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
 
