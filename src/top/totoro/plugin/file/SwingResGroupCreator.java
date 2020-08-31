@@ -1,15 +1,24 @@
 package top.totoro.plugin.file;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.messages.MessagesService;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.util.EventDispatcher;
+import top.totoro.plugin.util.ThreadPoolUtil;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.Thread.sleep;
 import static top.totoro.plugin.constant.Constants.DEFAULT_R_FILE_CONTENT;
 
 /**
@@ -37,6 +46,8 @@ public class SwingResGroupCreator {
     private static final String colorFieldStart = "\t\tpublic static final Color ";
 
     private static final Map<File, Map<File, List<String>>> idInRFilesMap = new ConcurrentHashMap<>();
+    // 各个资源文件下冲突的id表
+    private static final Map<File, List<String>> multipleIds = new ConcurrentHashMap<>();
     // key: 项目或子项目的路径， value: 项目路径下的资源文件集合
     private static final Map<String, List<File>> resFilesMap = new ConcurrentHashMap<>();
 
@@ -83,6 +94,7 @@ public class SwingResGroupCreator {
                     String anotherContent = totals[1].substring(totals[1].indexOf("}\n") + 2);
                     finalContents.append(layoutClassStart);
                     for (File layoutFile : layoutFiles) {
+                        if (layoutFile == null) continue;
                         String fileName = layoutFile.getName();
                         String field = layoutFieldStart + fileName.substring(0, fileName.lastIndexOf(".")) + "=\"" + fileName + "\";\n";
                         finalContents.append(field);
@@ -109,6 +121,7 @@ public class SwingResGroupCreator {
                 if (ids.length > 0) {
                     finalIds = new String[ids.length - 1];
                     for (int i = 1; i < ids.length; i++) {
+                        if (!ids[i].contains("\"")) continue;
                         finalIds[i - 1] = ids[i].substring(0, ids[i].indexOf("\""));
                     }
                 }
@@ -120,12 +133,32 @@ public class SwingResGroupCreator {
                 // 当前资源文件中的id值
                 List<String> idsInResFile = new ArrayList<>();
                 for (String finalId : finalIds) {
-                    if (idsInResFile.contains(finalId)) {
-                        Messages.showErrorDialog(finalId + "重复定义", "ID错误");
+                    if (idsInResFile.contains(finalId) && !multipleIds.computeIfAbsent(res, key -> new ArrayList<>()).contains(finalId)) {
+                        // 防止重复提示
+                        multipleIds.get(res).add(finalId);
+                        ThreadPoolUtil.execute(() -> {
+                            // 冲突已经解决，不需要提示
+                            if (!multipleIds.get(res).contains(finalId)) return;
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                Messages.showErrorDialog(finalId + "重复定义", "ID错误");
+                            }, ModalityState.NON_MODAL);
+                        }, 100);
                     } else {
+                        // 空的id不能被使用
+                        if ("".equals(finalId)) continue;
                         idsInResFile.add(finalId);
                     }
                 }
+                // 更新冲突的id表
+                List<String> multipleIdsInRes = new ArrayList<>(multipleIds.computeIfAbsent(res, key -> new ArrayList<>()));
+                for (String multipleId : multipleIds.computeIfAbsent(res, key -> new ArrayList<>())) {
+                    int matchCount = 0;
+                    for (String finalId : finalIds) {
+                        if (finalId.equals(multipleId)) matchCount++;
+                    }
+                    if (matchCount < 2) multipleIdsInRes.remove(multipleId);
+                }
+                multipleIds.put(res, multipleIdsInRes);
                 idInFileMap.put(res, idsInResFile);
                 // 处理加入的id
                 String[] totals = originRFileContents.split(idClassStartRegex);
