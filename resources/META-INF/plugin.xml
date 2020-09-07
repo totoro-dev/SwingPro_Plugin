@@ -6,7 +6,7 @@
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>
 
-    <change-notes>v1.0.3 增加创建默认应用属性值文件styles.swing功能；创建新项目功能的优化，与创建新模块区分；升级SwingPro的依赖为1.0.3
+    <change-notes>v1.0.4 增加自定义控件在swing布局中的代码自动填充；升级SwingPro的依赖为1.0.3
     </change-notes>
 
     <idea-version since-build="193.0"/>
@@ -14,12 +14,12 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
 
-<!--    <applicationListeners>-->
-<!--        <listener class="top.totoro.plugin.file.SwingProjectOpenListener"-->
-<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
-<!--        &lt;!&ndash;        <listener class="top.totoro.plugin.file.SwingModuleListener"&ndash;&gt;-->
-<!--        &lt;!&ndash;                  topic="com.intellij.openapi.project.ModuleListener"/>&ndash;&gt;-->
-<!--    </applicationListeners>-->
+    <applicationListeners>
+        <listener class="top.totoro.plugin.file.SwingProjectOpenListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+        <!--        <listener class="top.totoro.plugin.file.SwingModuleListener"-->
+        <!--                  topic="com.intellij.openapi.project.ModuleListener"/>-->
+    </applicationListeners>
 
     <extensions defaultExtensionNs="com.intellij">
         <!--        <fileType name="Swing" implementationClass="top.totoro.plugin.file.SwingFileType"-->

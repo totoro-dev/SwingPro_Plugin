@@ -4,7 +4,9 @@ package top.totoro.plugin.core;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
@@ -14,23 +16,40 @@ import top.totoro.plugin.constant.AttributeDefaultValue;
 import top.totoro.plugin.constant.AttributeKey;
 import top.totoro.plugin.file.Log;
 
+import javax.swing.text.View;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SimpleCompletionContributor extends CompletionContributor {
 
     private static final String TAG = SimpleCompletionContributor.class.getSimpleName();
 
+    public static List<LookupElement> customTagLookElements = new LinkedList<>();
     static List<LookupElement> tagLookupElements = new LinkedList<>();
     static List<LookupElement> keyLookupElements = new LinkedList<>();
     static List<LookupElement> valueLookupElements = new LinkedList<>();
 
-    static List<String> layoutTags = new LinkedList<>();
-    static List<String> viewTags = new LinkedList<>();
+    public static List<String> layoutTags = new LinkedList<>();
+    public static List<String> viewTags = new LinkedList<>();
 
     /* 标签对应的构建字段 */
     static Map<String, List<LookupElement>> tagKeysMap = new HashMap<>();
     /* 关键字段对应的值 */
     static Map<String, List<LookupElement>> keyValuesMap = new HashMap<>();
+
+    public static void addCustomLayoutTagLookElement(String tag) {
+        Log.d(TAG, "addCustomLayoutTagLookElement() layout tag = " + tag);
+        layoutTags.add(tag);
+        customTagLookElements.add(LookupElementBuilder.create(tag).withInsertHandler(tagInsertHandler));
+        createKeyLookupElement(tag);
+    }
+
+    public static void addCustomViewTagLookElement(String tag) {
+        Log.d(TAG, "addCustomViewTagLookElement() view tag = " + tag);
+        viewTags.add(tag);
+        customTagLookElements.add(LookupElementBuilder.create(tag).withInsertHandler(tagInsertHandler));
+        createKeyLookupElement(tag);
+    }
 
     static final InsertHandler<LookupElement> tagInsertHandler = (context, lookupElement) -> {
         // add by HLM 确定当前的tag，自动填充width和height属性，同时自动关闭标签
@@ -59,6 +78,11 @@ public class SimpleCompletionContributor extends CompletionContributor {
             document.insertString(tailOffset, closeElement);
             // 移动光标到所有属性的最后面，使得可以直接添加属性
             editor.getCaretModel().moveToOffset(tailOffset);
+        } else if (tag.contains(".")) {
+            closeElement = ">\n" + whiteSpace + "\t";
+            document.insertString(tailOffset, closeElement);
+            // 移动光标到新的行，使得可以直接添加新的标签节点
+            editor.getCaretModel().moveToOffset(tailOffset + 1 + whiteSpace.length() + "\n\t".length());
         }
     };
     static final InsertHandler<LookupElement> keyInsertHandler = (context, lookupElement) -> {
@@ -192,6 +216,16 @@ public class SimpleCompletionContributor extends CompletionContributor {
                                                @NotNull CompletionResultSet resultSet) {
                         Log.d(TAG, "completion as tag");
                         resultSet.addAllElements(tagLookupElements);
+//                        Project project = (Project) context.get(CommonDataKeys.PROJECT);
+//                        if (customTagLookElements.get(project) != null) {
+                        if (customTagLookElements.size() > 0) {
+                            List<LookupElement> copyCustomTags = new LinkedList<>(customTagLookElements);
+                            for (LookupElement lookupElement : copyCustomTags) {
+                                Log.d(this, "custom tag = " + lookupElement.getLookupString());
+                                resultSet.addElement(lookupElement);
+                            }
+                        }
+//                        }
                     }
                 }
         );
@@ -240,10 +274,6 @@ public class SimpleCompletionContributor extends CompletionContributor {
                     }
                 }
         );
-    }
-
-    public static void editChanged() {
-
     }
 
     @Nullable
