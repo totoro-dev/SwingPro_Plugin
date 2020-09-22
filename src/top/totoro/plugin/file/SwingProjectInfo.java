@@ -14,25 +14,76 @@ public class SwingProjectInfo {
     private final List<String> hasInitFiles = new LinkedList<>();
     private static final Map<String, SwingProjectInfo> projects = new ConcurrentHashMap<>();
 
+    private List<String> containProjectPathList = new ArrayList<>();
+
     public static void setProject(Project project) {
         if (projects.get(project.getBasePath()) == null) {
             SwingProjectInfo swingProjectInfo = new SwingProjectInfo();
             swingProjectInfo.project = project;
             projects.put(project.getBasePath(), swingProjectInfo);
+            swingProjectInfo.initSubProjectPath();
+            // 初始化自定义View标签
             swingProjectInfo.initCustomViewTag();
+            // 间断性刷新R.java
+            swingProjectInfo.scanResPackage();
+        }
+    }
+
+    public void initSubProjectPath() {
+        String projectPath = project.getBasePath();
+        if (projectPath == null) return;
+        containProjectPathList.add(projectPath.replace("\\", "/"));
+        File rootPath = new File(projectPath);
+        File[] files = rootPath.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (!file.isDirectory()
+                    || file.getName().equals("out")
+                    || file.getName().equals("target")
+                    || file.getName().equals("build"))
+                continue;
+
+            // 一般开发的子项目都只会在第二层路径，暂时不做更深的探寻
+            searchProjectDeep(file);
+        }
+        Log.d(this, "containProjectPathList = " + containProjectPathList);
+    }
+
+    /**
+     * 深度搜索子项目
+     *
+     * @param parentProject 父项目路径
+     */
+    private void searchProjectDeep(File parentProject) {
+        File[] files = parentProject.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (!file.isDirectory()
+                    || file.getName().equals("out")
+                    || file.getName().equals("target")
+                    || file.getName().equals("build"))
+                continue;
+
+            // 不是主项目下的src文件夹，说明这是一个子项目的src文件夹
+            if (file.getName().equals("src")) {
+                String parentPath = file.getParent().replace("\\", "/");
+                if (containProjectPathList.contains(parentPath)) continue;
+                containProjectPathList.add(parentPath);
+            }
         }
     }
 
     public void initCustomViewTag() {
-        String projectPath = project.getBasePath();
-        String srcPath = projectPath + "/src/main/java";
-        File srcDir = new File(srcPath);
-        if (srcDir.exists() && srcDir.isDirectory()) {
-            for (File file : Objects.requireNonNull(srcDir.listFiles())) {
-                scanPackage(file);
+        for (String projectPath : containProjectPathList) {
+            String srcPath = projectPath + "/src/main/java";
+            File srcDir = new File(srcPath);
+            if (srcDir.exists() && srcDir.isDirectory()) {
+                for (File file : Objects.requireNonNull(srcDir.listFiles())) {
+                    scanJavaPackage(file);
+                }
             }
+            resolveOtherTag();
         }
-        resolveOtherTag();
         ThreadPoolUtil.execute(this::initCustomViewTag, 2000);
     }
 
@@ -54,11 +105,23 @@ public class SwingProjectInfo {
         waitToResolveTags.clear();
     }
 
-    private void scanPackage(File parent) {
+    public void scanResPackage() {
+        for (String projectPath : containProjectPathList) {
+            SwingResGroupCreator.createMipmapGroup(projectPath);
+        }
+        ThreadPoolUtil.execute(this::scanResPackage, 2000);
+    }
+
+    /**
+     * 扫描项目中的源码包，记录创建的自定义View
+     *
+     * @param parent 扫描的包目录
+     */
+    private void scanJavaPackage(File parent) {
         Log.d(this, "scanPackage() path = " + parent.getPath());
         for (File file : Objects.requireNonNull(parent.listFiles())) {
             if (file.isDirectory()) {
-                scanPackage(file);
+                scanJavaPackage(file);
                 continue;
             }
             if (hasInitFiles.contains(file.getPath())) {

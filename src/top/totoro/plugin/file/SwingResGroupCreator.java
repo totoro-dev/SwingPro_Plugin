@@ -44,6 +44,9 @@ public class SwingResGroupCreator {
     private static final String colorClassStart = "\tpublic static class color {\n";
     private static final String colorClassStartRegex = "\tpublic static class color \\{\n";
     private static final String colorFieldStart = "\t\tpublic static final Color ";
+    private static final String mipmapClassStart = "\tpublic static class mipmap {\n";
+    private static final String mipmapClassStartRegex = "\tpublic static class mipmap \\{\n";
+    private static final String mipmapFieldStart = "\t\tpublic static final String ";
 
     private static final Map<File, Map<File, List<String>>> idInRFilesMap = new ConcurrentHashMap<>();
     // 各个资源文件下冲突的id表
@@ -55,6 +58,7 @@ public class SwingResGroupCreator {
         File resParent = res.getParentFile();
         if (resParent == null) return;
         String resParentName = resParent.getName();
+        Log.d(TAG, "resParentName = " + resParentName);
         switch (resParentName) {
             case "layout":
                 Log.d(TAG, "createResGroup() is layout");
@@ -68,6 +72,55 @@ public class SwingResGroupCreator {
                 break;
             case "values":
                 break;
+        }
+    }
+
+    // 需要在项目打开的时候间断性刷新
+    public static void createMipmapGroup(String projectPath) {
+        String resPath = projectPath + "/src/main/resources/";
+        // 得到mipmap目录
+        String mipmapDirPath = resPath + "mipmap";
+        File mipmapDir = new File(mipmapDirPath);
+        File[] mipmapFiles = mipmapDir.listFiles();
+        if (mipmapFiles == null) return;
+        // 刷新R.java中的mipmap引用
+        createMipmapGroup(projectPath, Arrays.asList(mipmapFiles));
+    }
+
+    private static void createMipmapGroup(String projectPath, List<File> mipmapFiles) {
+        Log.d(TAG, "createMipmapGroup() mipmap file size = " + mipmapFiles.size());
+        try {
+            // 确定R.java文件已生成
+            File RFile = checkRFileCreated(projectPath);
+            if (RFile.exists()) {
+                String originRFileContents = getRFileContent(RFile);
+                StringBuilder finalContents = new StringBuilder(originRFileContents);
+                String[] totals = originRFileContents.split(mipmapClassStartRegex);
+                if (totals.length == 1) {
+                    finalContents = new StringBuilder(totals[0].substring(0, totals[0].lastIndexOf("}")));
+                    finalContents.append(mipmapClassStart);
+                    for (File mipmapFile : mipmapFiles) {
+                        String fileName = mipmapFile.getName();
+                        String field = mipmapFieldStart + fileName.substring(0, fileName.indexOf(".")) + "=\"" + fileName + "\";\n";
+                        finalContents.append(field);
+                    }
+                    finalContents.append("\t}\n}");
+                } else if (totals.length == 2) {
+                    finalContents = new StringBuilder(totals[0]);
+                    String anotherContent = totals[1].substring(totals[1].indexOf("}\n") + 2);
+                    finalContents.append(mipmapClassStart);
+                    for (File mipmapFile : mipmapFiles) {
+                        String fileName = mipmapFile.getName();
+                        String field = mipmapFieldStart + fileName.substring(0, fileName.indexOf(".")) + "=\"" + fileName + "\";\n";
+                        finalContents.append(field);
+                    }
+                    finalContents.append("\t}\n").append(anotherContent);
+                }
+                if (finalContents.toString().equals(originRFileContents)) return;
+                setRFileContent(RFile, finalContents.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -104,8 +157,7 @@ public class SwingResGroupCreator {
                 if (finalContents.toString().equals(originRFileContents)) return;
                 setRFileContent(RFile, finalContents.toString());
             }
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

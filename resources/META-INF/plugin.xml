@@ -1,12 +1,12 @@
 <idea-plugin>
     <id>top.totoro.plugin.SwingPro</id>
     <name>SwingPro</name>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>
 
-    <change-notes>v1.0.4 增加自定义控件在swing布局中的代码自动填充；升级SwingPro的依赖为1.0.3
+    <change-notes>v1.0.4 增加自定义控件在swing布局中的代码自动填充；增加mipmap目录的资源扫描；升级SwingPro的依赖为1.0.4
     </change-notes>
 
     <idea-version since-build="193.0"/>
