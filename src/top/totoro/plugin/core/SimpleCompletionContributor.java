@@ -29,8 +29,8 @@ public class SimpleCompletionContributor extends CompletionContributor {
     static List<LookupElement> keyLookupElements = new LinkedList<>();
     static List<LookupElement> valueLookupElements = new LinkedList<>();
 
-    public static List<String> layoutTags = new LinkedList<>();
-    public static List<String> viewTags = new LinkedList<>();
+    public static List<String> layoutTags;
+    public static List<String> viewTags;
 
     /* 标签对应的构建字段 */
     static Map<String, List<LookupElement>> tagKeysMap = new HashMap<>();
@@ -127,23 +127,15 @@ public class SimpleCompletionContributor extends CompletionContributor {
     };
 
     static {
-        layoutTags.add("CenterLayout");
-        layoutTags.add("FrameLayout");
-        layoutTags.add("LinearLayout");
-        viewTags.add("Button");
-        viewTags.add("EditText");
-        viewTags.add("ImageButton");
-        viewTags.add("ImageView");
-        viewTags.add("RecyclerView");
-        viewTags.add("Span");
-        viewTags.add("Spinner");
-        viewTags.add("SwitchButton");
-        viewTags.add("TextView");
+        layoutTags = new LinkedList<>(Arrays.asList("CenterLayout", "FrameLayout", "GridLayout", "LinearLayout"));
+        viewTags = new LinkedList<>(Arrays.asList("Button", "EditText", "ImageButton", "ImageView",
+                "RecyclerView", "Span", "Spinner", "SwitchButton", "TextView"));
         createTagLookElement();
 
         createKeyLookupElement("CenterLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("FrameLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("LinearLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
+        createKeyLookupElement("GridLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY, AttributeKey.column);
         createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
         createKeyLookupElement("EditText", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,

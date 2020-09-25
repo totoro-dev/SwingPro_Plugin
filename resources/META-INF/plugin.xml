@@ -6,7 +6,7 @@
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>
 
-    <change-notes>v1.0.4 增加自定义控件在swing布局中的代码自动填充；增加mipmap目录的资源扫描；升级SwingPro的依赖为1.0.4
+    <change-notes>v1.0.4 增加自定义控件布局代码的自动填充；增加mipmap目录的资源扫描；增加对GridLayout的支持；升级SwingPro的依赖为1.0.4
     </change-notes>
 
     <idea-version since-build="193.0"/>

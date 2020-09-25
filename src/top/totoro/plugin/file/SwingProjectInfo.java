@@ -25,7 +25,8 @@ public class SwingProjectInfo {
             // 初始化自定义View标签
             swingProjectInfo.initCustomViewTag();
             // 间断性刷新R.java
-            swingProjectInfo.scanResPackage();
+            ThreadPoolUtil.execute(swingProjectInfo::scanMipmapPackage, 1000);
+//            swingProjectInfo.scanResPackage();
         }
     }
 
@@ -43,7 +44,7 @@ public class SwingProjectInfo {
                     || file.getName().equals("build"))
                 continue;
 
-            // 一般开发的子项目都只会在第二层路径，暂时不做更深的探寻
+            // TODO: 一般开发的子项目都只会在第二层路径，暂时不做更深的探寻
             searchProjectDeep(file);
         }
         Log.d(this, "containProjectPathList = " + containProjectPathList);
@@ -84,7 +85,8 @@ public class SwingProjectInfo {
             }
             resolveOtherTag();
         }
-        ThreadPoolUtil.execute(this::initCustomViewTag, 2000);
+        // 10秒扫描一次
+        ThreadPoolUtil.execute(this::initCustomViewTag, 10000);
     }
 
     private void resolveOtherTag() {
@@ -105,11 +107,17 @@ public class SwingProjectInfo {
         waitToResolveTags.clear();
     }
 
-    public void scanResPackage() {
+    /**
+     * 扫描项目中的图片资源包，添加记录到R.java中
+     */
+    public void scanMipmapPackage() {
         for (String projectPath : containProjectPathList) {
             SwingResGroupCreator.createMipmapGroup(projectPath);
         }
-        ThreadPoolUtil.execute(this::scanResPackage, 2000);
+        // 及时同步刷新项目，使得修改后的引用能被索引到
+        project.getBaseDir().refresh(false, true);
+        // 10秒扫描一次
+        ThreadPoolUtil.execute(this::scanMipmapPackage, 10000);
     }
 
     /**
@@ -118,7 +126,7 @@ public class SwingProjectInfo {
      * @param parent 扫描的包目录
      */
     private void scanJavaPackage(File parent) {
-        Log.d(this, "scanPackage() path = " + parent.getPath());
+        Log.d(this, "scanJavaPackage() path = " + parent.getPath());
         for (File file : Objects.requireNonNull(parent.listFiles())) {
             if (file.isDirectory()) {
                 scanJavaPackage(file);
