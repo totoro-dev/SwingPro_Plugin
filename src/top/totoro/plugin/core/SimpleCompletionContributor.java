@@ -12,7 +12,9 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.totoro.plugin.constant.AttributeDefaultValue;
+
+import static top.totoro.plugin.constant.AttributeDefaultValue.*;
+
 import top.totoro.plugin.constant.AttributeKey;
 import top.totoro.plugin.file.Log;
 
@@ -63,8 +65,8 @@ public class SimpleCompletionContributor extends CompletionContributor {
         String whiteSpace = subString.substring(subString.lastIndexOf("\n") + 1, subString.lastIndexOf("<"));
         // 自动填充的属性内容
         String attrContent = "\n" +
-                whiteSpace + "\t" + AttributeKey.WIDTH + "=\"" + AttributeDefaultValue.MATCH_PARENT + "\"\n" +
-                whiteSpace + "\t" + AttributeKey.HEIGHT + "=\"" + AttributeDefaultValue.MATCH_PARENT + "\"";
+                whiteSpace + "\t" + AttributeKey.WIDTH + "=\"" + MATCH_PARENT + "\"\n" +
+                whiteSpace + "\t" + AttributeKey.HEIGHT + "=\"" + MATCH_PARENT + "\"";
         document.insertString(tailOffset, attrContent);
         tailOffset += attrContent.length(); // 增加自动填充属性内容的偏移
         String closeElement; // 自动闭合标签的内容
@@ -97,12 +99,12 @@ public class SimpleCompletionContributor extends CompletionContributor {
             case AttributeKey.WIDTH:
             case AttributeKey.HEIGHT:
                 // 需要先插入默认内容，再获取内容的最后的位置LogicalPosition，得到的才是准确的位置
-                document.insertString(tailOffset, AttributeDefaultValue.MATCH_PARENT + "\"");
-                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.MATCH_PARENT.length());
+                document.insertString(tailOffset, MATCH_PARENT + "\"");
+                end = editor.offsetToLogicalPosition(tailOffset + MATCH_PARENT.length());
                 break;
             case AttributeKey.ORIENTATION:
-                document.insertString(tailOffset, AttributeDefaultValue.HORIZONTAL + "\"");
-                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.HORIZONTAL.length());
+                document.insertString(tailOffset, HORIZONTAL + "\"");
+                end = editor.offsetToLogicalPosition(tailOffset + HORIZONTAL.length());
                 break;
             case AttributeKey.SRC:
                 document.insertString(tailOffset, "mipmap/" + "\"");
@@ -110,12 +112,12 @@ public class SimpleCompletionContributor extends CompletionContributor {
                 // 不需要选中内容，直接返回
                 return;
             case AttributeKey.BACKGROUND:
-                document.insertString(tailOffset, AttributeDefaultValue.WHITE_COLOR + "\"");
+                document.insertString(tailOffset, WHITE_COLOR + "\"");
                 // 将光标移动到#号之后
                 editor.getCaretModel().moveToOffset(tailOffset + 1);
                 // 背景颜色从#符号之后开始选中（数字部分）
                 start = editor.offsetToLogicalPosition(tailOffset + 1);
-                end = editor.offsetToLogicalPosition(tailOffset + AttributeDefaultValue.WHITE_COLOR.length());
+                end = editor.offsetToLogicalPosition(tailOffset + WHITE_COLOR.length());
                 break;
         }
         if (end == null) {
@@ -136,7 +138,7 @@ public class SimpleCompletionContributor extends CompletionContributor {
         createKeyLookupElement("FrameLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("LinearLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("GridLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY, AttributeKey.column);
-        createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
+        createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE, AttributeKey.TEXT_ALIGNMENT,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
         createKeyLookupElement("EditText", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR, AttributeKey.HINT_TEXT);
@@ -146,22 +148,23 @@ public class SimpleCompletionContributor extends CompletionContributor {
         createKeyLookupElement("Span");
         createKeyLookupElement("Spinner", AttributeKey.arrayAttrKey, AttributeKey.selectedColorKey, AttributeKey.enterColorKey);
         createKeyLookupElement("SwitchButton", AttributeKey.switchOnKey, AttributeKey.switchOffKey, AttributeKey.isSwitchOnKey);
-        createKeyLookupElement("TextView", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
+        createKeyLookupElement("TextView", AttributeKey.TEXT, AttributeKey.TEXT_SIZE, AttributeKey.TEXT_ALIGNMENT,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
 
-        createValueLookupElement(AttributeKey.WIDTH, AttributeDefaultValue.MATCH_PARENT, AttributeDefaultValue.WRAP_CONTENT);
-        createValueLookupElement(AttributeKey.HEIGHT, AttributeDefaultValue.MATCH_PARENT, AttributeDefaultValue.WRAP_CONTENT);
-        createValueLookupElement(AttributeKey.ORIENTATION, AttributeDefaultValue.VERTICAL, AttributeDefaultValue.HORIZONTAL);
-        createValueLookupElement(AttributeKey.VISIBLE, AttributeDefaultValue.VISIBLE, AttributeDefaultValue.GONE);
-        createValueLookupElement(AttributeKey.OPAQUE, AttributeDefaultValue.OPAQUE, AttributeDefaultValue.NOT_OPAQUE);
-        createValueLookupElement(AttributeKey.TEXT_STYLE, AttributeDefaultValue.SERIF, AttributeDefaultValue.SANS_SERIF,
-                AttributeDefaultValue.DIALOG, AttributeDefaultValue.DIALOG_INPUT, AttributeDefaultValue.MONOSPACED);
-        createValueLookupElement(AttributeKey.TEXT_FONT, AttributeDefaultValue.PLAIN,
-                AttributeDefaultValue.BOLD, AttributeDefaultValue.ITALIC);
-        createValueLookupElement(AttributeKey.GRAVITY, AttributeDefaultValue.left, AttributeDefaultValue.right,
-                AttributeDefaultValue.top, AttributeDefaultValue.bottom, AttributeDefaultValue.center);
-        createValueLookupElement(AttributeKey.scaleType, AttributeDefaultValue.scaleFitCenter, AttributeDefaultValue.scaleCenter,
-                AttributeDefaultValue.scaleFitXY, AttributeDefaultValue.scaleFitStart, AttributeDefaultValue.scaleFitEnd);
+        createValueLookupElement(AttributeKey.WIDTH, MATCH_PARENT, WRAP_CONTENT);
+        createValueLookupElement(AttributeKey.HEIGHT, MATCH_PARENT, WRAP_CONTENT);
+        createValueLookupElement(AttributeKey.ORIENTATION, VERTICAL, HORIZONTAL);
+        createValueLookupElement(AttributeKey.VISIBLE, VISIBLE, GONE);
+        createValueLookupElement(AttributeKey.OPAQUE, OPAQUE, NOT_OPAQUE);
+        createValueLookupElement(AttributeKey.TEXT_STYLE, SERIF, SANS_SERIF,
+                DIALOG, DIALOG_INPUT, MONOSPACED);
+        createValueLookupElement(AttributeKey.TEXT_FONT, PLAIN, BOLD, ITALIC);
+        createValueLookupElement(AttributeKey.GRAVITY, left, right, top, bottom, center);
+        createValueLookupElement(AttributeKey.TEXT_ALIGNMENT,
+                left, right, top, bottom, center,
+                leftAndTop, leftAndBottom, rightAndTop, rightAndBottom);
+        createValueLookupElement(AttributeKey.scaleType, scaleFitCenter, scaleCenter,
+                scaleFitXY, scaleFitStart, scaleFitEnd);
 
     }
 

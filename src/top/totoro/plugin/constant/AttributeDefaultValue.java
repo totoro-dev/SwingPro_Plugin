@@ -34,12 +34,16 @@ public class AttributeDefaultValue {
     public static final String BOLD = "bold";
     public static final String ITALIC = "italic";
 
-    // gravity属性
+    // gravity|文本对齐
     public static final String left = "left";
     public static final String right = "right";
     public static final String top = "top";
     public static final String bottom = "bottom";
     public static final String center = "center";
+    public static final String leftAndTop = "left|top";
+    public static final String leftAndBottom = "left|bottom";
+    public static final String rightAndTop = "right|top";
+    public static final String rightAndBottom = "right|bottom";
 
     // 图片缩放，裁剪
     public static final String scaleFitCenter = "fitCenter";

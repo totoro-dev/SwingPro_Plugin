@@ -25,6 +25,7 @@ public final class AttributeKey {
     public static final String TEXT_STYLE = "textStyle";
     public static final String TEXT_FONT = "textFont";
     public static final String TEXT_COLOR = "textColor";
+    public static final String TEXT_ALIGNMENT = "alignment";
 
     public static final String HINT_TEXT = "hintText";
 
