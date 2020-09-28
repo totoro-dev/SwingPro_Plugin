@@ -23,9 +23,9 @@ public class SwingProjectInfo {
             projects.put(project.getBasePath(), swingProjectInfo);
             swingProjectInfo.initSubProjectPath();
             // 初始化自定义View标签
-            swingProjectInfo.initCustomViewTag();
+            ThreadPoolUtil.execute(swingProjectInfo::initCustomViewTag, 10000);
             // 间断性刷新R.java
-            ThreadPoolUtil.execute(swingProjectInfo::scanResPackage, 1000);
+            ThreadPoolUtil.execute(swingProjectInfo::scanResPackage, 5000);
 //            swingProjectInfo.scanResPackage();
         }
     }

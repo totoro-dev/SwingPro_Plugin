@@ -176,6 +176,7 @@ public class SwingResGroupCreator {
                 createIdGroup(projectPath, layoutFile, content);
             }
         }
+        createLayoutGroup(projectPath, Arrays.asList(layoutFiles));
     }
 
     public static void createIdGroup(String projectPath, File res, String resFileContent) {
