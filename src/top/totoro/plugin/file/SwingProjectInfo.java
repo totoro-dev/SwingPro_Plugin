@@ -25,7 +25,7 @@ public class SwingProjectInfo {
             // 初始化自定义View标签
             swingProjectInfo.initCustomViewTag();
             // 间断性刷新R.java
-            ThreadPoolUtil.execute(swingProjectInfo::scanMipmapPackage, 1000);
+            ThreadPoolUtil.execute(swingProjectInfo::scanResPackage, 1000);
 //            swingProjectInfo.scanResPackage();
         }
     }
@@ -108,16 +108,17 @@ public class SwingProjectInfo {
     }
 
     /**
-     * 扫描项目中的图片资源包，添加记录到R.java中
+     * 扫描项目中的图片资源包、布局资源包，添加记录到R.java中
      */
-    public void scanMipmapPackage() {
+    public void scanResPackage() {
         for (String projectPath : containProjectPathList) {
             SwingResGroupCreator.createMipmapGroup(projectPath);
+            SwingResGroupCreator.createIdGroup(projectPath);
         }
         // 及时同步刷新项目，使得修改后的引用能被索引到
         project.getBaseDir().refresh(false, true);
         // 10秒扫描一次
-        ThreadPoolUtil.execute(this::scanMipmapPackage, 10000);
+        ThreadPoolUtil.execute(this::scanResPackage, 10000);
     }
 
     /**

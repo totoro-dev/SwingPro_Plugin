@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>top.totoro.plugin.SwingPro</id>
     <name>SwingPro</name>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>

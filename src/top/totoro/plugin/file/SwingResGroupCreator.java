@@ -162,6 +162,22 @@ public class SwingResGroupCreator {
         }
     }
 
+    public static void createIdGroup(String projectPath) {
+        String resPath = projectPath + "/src/main/resources/";
+        // 得到layout目录
+        String layoutDirPath = resPath + "layout";
+        File layoutDir = new File(layoutDirPath);
+        File[] layoutFiles = layoutDir.listFiles();
+        if (layoutFiles == null) return;
+        // 刷新R.java中的id引用
+        for (File layoutFile : layoutFiles) {
+            String content = FileContent.getFileContent(layoutFile);
+            if (content.length() > 0) {
+                createIdGroup(projectPath, layoutFile, content);
+            }
+        }
+    }
+
     public static void createIdGroup(String projectPath, File res, String resFileContent) {
         try {
             // 确定R.java文件已生成
