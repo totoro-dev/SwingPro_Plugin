@@ -17,6 +17,10 @@ public final class AttributeKey {
     public static final String MARGIN_TOP = "marginTop";
     public static final String MARGIN_BOTTOM = "marginBottom";
 
+    public static final String GAP = "gap";
+    public static final String GAP_VERTICAL = "gapVertical";
+    public static final String GAP_HORIZONTAL = "gapHorizontal";
+
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
 

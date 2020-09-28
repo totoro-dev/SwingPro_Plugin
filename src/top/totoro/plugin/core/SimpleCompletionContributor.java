@@ -133,7 +133,8 @@ public class SimpleCompletionContributor extends CompletionContributor {
         createKeyLookupElement("CenterLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("FrameLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
         createKeyLookupElement("LinearLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY);
-        createKeyLookupElement("GridLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY, AttributeKey.column);
+        createKeyLookupElement("GridLayout", AttributeKey.ORIENTATION, AttributeKey.GRAVITY, AttributeKey.column,
+                AttributeKey.GAP, AttributeKey.GAP_VERTICAL, AttributeKey.GAP_HORIZONTAL);
         createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE, AttributeKey.TEXT_ALIGNMENT,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
         createKeyLookupElement("EditText", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
