@@ -4,23 +4,17 @@ package top.totoro.plugin.core;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static top.totoro.plugin.constant.AttributeDefaultValue.*;
-
 import top.totoro.plugin.constant.AttributeKey;
 import top.totoro.plugin.file.Log;
 
-import javax.swing.text.View;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static top.totoro.plugin.constant.AttributeDefaultValue.*;
 
 public class SimpleCompletionContributor extends CompletionContributor {
 
@@ -56,11 +50,13 @@ public class SimpleCompletionContributor extends CompletionContributor {
     static final InsertHandler<LookupElement> tagInsertHandler = (context, lookupElement) -> {
         // add by HLM 确定当前的tag，自动填充width和height属性，同时自动关闭标签
         String tag = lookupElement.getLookupString();
-        if (tag.startsWith("/")) return; // 闭合标签
         Editor editor = context.getEditor();
         Document document = editor.getDocument();
         int tailOffset = editor.getCaretModel().getOffset();
         String subString = document.getText().substring(0, tailOffset);
+        String tailString = document.getText().substring(tailOffset);
+        if (tailString.indexOf(">") < tailString.indexOf("<")) return; // 标签重命名
+        if (subString.substring(subString.length() - tag.length() - 1).startsWith("/")) return; // 闭合标签
         // 获取新增标签前面的空白内容，用于后面的自动填充
         String whiteSpace = subString.substring(subString.lastIndexOf("\n") + 1, subString.lastIndexOf("<"));
         // 自动填充的属性内容
@@ -189,6 +185,11 @@ public class SimpleCompletionContributor extends CompletionContributor {
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.BACKGROUND).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.VISIBLE).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.OPAQUE).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_LEFT).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_RIGHT).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_TOP).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_BOTTOM).withInsertHandler(keyInsertHandler));
         tagKeysMap.put(tag, new LinkedList<>(keyLookupElements));
         keyLookupElements.clear();
     }
