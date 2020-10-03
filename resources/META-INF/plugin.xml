@@ -6,7 +6,7 @@
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>
 
-    <change-notes>v1.0.5 增加alignment属性；增加margin属性；增加gap属性；升级SwingPro的依赖为1.0.5
+    <change-notes>v1.0.6 增加src属性中图片资源的代码提示；增加布局预览功能；升级SwingPro的依赖为1.0.6
     </change-notes>
 
     <idea-version since-build="193.0"/>
@@ -43,6 +43,8 @@
                                  implementationClass="top.totoro.plugin.core.SimpleRefactoringSupportProvider"/>
         <lang.findUsagesProvider language="Simple"
                                  implementationClass="top.totoro.plugin.core.SimpleFindUsagesProvider"/>
+        <toolWindow id="SwingPro预览" secondary="true" icon="AllIcons.General.Layout" anchor="right"
+                    factoryClass="top.totoro.plugin.ui.PreviewWindowFactory"/>
     </extensions>
 
     <actions>
