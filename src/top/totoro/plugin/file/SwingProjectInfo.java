@@ -2,6 +2,7 @@ package top.totoro.plugin.file;
 
 import com.intellij.openapi.project.Project;
 import top.totoro.plugin.core.SimpleCompletionContributor;
+import top.totoro.plugin.util.Log;
 import top.totoro.plugin.util.ThreadPoolUtil;
 
 import java.io.File;

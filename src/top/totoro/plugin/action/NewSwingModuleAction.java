@@ -13,7 +13,7 @@ import com.intellij.openapi.roots.ui.configuration.actions.NewModuleAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 import top.totoro.plugin.file.SwingProjectInitializer;
 import top.totoro.plugin.ui.NewSwingModuleWrapper;
 

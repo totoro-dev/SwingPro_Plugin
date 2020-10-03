@@ -9,8 +9,8 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.totoro.plugin.constant.AttributeKey;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
+import top.totoro.swing.widget.util.AttributeKey;
 
 import java.util.*;
 

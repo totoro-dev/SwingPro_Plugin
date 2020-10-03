@@ -109,7 +109,7 @@ public class Constants {
             "\t\t<dependency>\n" +
             "\t\t\t<groupId>io.github.totoro-dev</groupId>\n" +
             "\t\t\t<artifactId>SwingPro</artifactId>\n" +
-            "\t\t\t<version>1.0.5</version>\n" +
+            "\t\t\t<version>1.0.6</version>\n" +
             "\t\t</dependency>\n" +
             "\t</dependencies>\n";
 }

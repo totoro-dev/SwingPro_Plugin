@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.*;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 
 import java.util.*;
 

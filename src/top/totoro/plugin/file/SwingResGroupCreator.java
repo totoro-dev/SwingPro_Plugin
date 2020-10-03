@@ -3,9 +3,10 @@ package top.totoro.plugin.file;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.ui.Messages;
-import top.totoro.plugin.constant.AttributeKey;
 import top.totoro.plugin.core.SimpleCompletionContributor;
+import top.totoro.plugin.util.Log;
 import top.totoro.plugin.util.ThreadPoolUtil;
+import top.totoro.swing.widget.util.AttributeKey;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

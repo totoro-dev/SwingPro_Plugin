@@ -3,25 +3,13 @@ package top.totoro.plugin.ui;
 import com.intellij.ide.projectWizard.NewProjectWizard;
 import com.intellij.ide.projectWizard.ProjectTypeStep;
 import com.intellij.ide.util.newProjectWizard.TemplatesGroup;
-import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
-import com.intellij.internal.statistic.eventLog.FeatureUsageUiEventsKt;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.platform.ProjectTemplate;
-import com.intellij.remoteServer.impl.module.CloudModuleBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 

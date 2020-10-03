@@ -7,7 +7,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,8 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-
-import static top.totoro.plugin.constant.Constants.NEW_SWING_FILE_CONTENT;
 
 public class NewActivityFileAction extends AnAction {
 

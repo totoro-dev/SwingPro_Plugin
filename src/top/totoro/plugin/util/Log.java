@@ -1,4 +1,4 @@
-package top.totoro.plugin.file;
+package top.totoro.plugin.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

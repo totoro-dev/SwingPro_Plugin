@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 import top.totoro.plugin.file.SwingResGroupCreator;
 import top.totoro.plugin.util.ThreadPoolUtil;
 
@@ -23,6 +23,9 @@ public class SimpleFileType extends LanguageFileType {
     public static final SimpleFileType INSTANCE = new SimpleFileType();
     // 解决修改文件时频繁同步更新的问题，提升性能
     private final Map<VirtualFile, Integer> updateCounts = new ConcurrentHashMap<>();
+
+    public static String currentFile = "";
+    public static boolean updated = false;
 
     private SimpleFileType() {
         super(SimpleLanguage.INSTANCE);
@@ -65,8 +68,10 @@ public class SimpleFileType extends LanguageFileType {
         Log.d(TAG, "extractCharsetFromFileContent()");
         if (project == null || virtualFile == null) return super.extractCharsetFromFileContent(project, null, content);
         if (Objects.equals(virtualFile.getExtension(), getDefaultExtension()) && virtualFile.getPath().contains("src/main/resources")) {
+            currentFile = virtualFile.getPath();
             int updateCount = updateCounts.computeIfAbsent(virtualFile, key -> 1);
             updateCounts.put(virtualFile, updateCounts.get(virtualFile) + 1);
+            updated = true;
             ThreadPoolUtil.execute(() -> {
                 if (updateCount + 1 != updateCounts.get(virtualFile)) return;
                 String swingFilePath = virtualFile.getPath();

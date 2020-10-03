@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 
 public class SwingProGroup extends DefaultActionGroup {
 

@@ -1,4 +1,4 @@
-package top.totoro.plugin.constant;
+package top.totoro.swing.widget.util;
 
 public final class AttributeKey {
 

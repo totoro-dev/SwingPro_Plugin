@@ -1,5 +1,7 @@
 package top.totoro.plugin.file;
 
+import top.totoro.plugin.util.Log;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 

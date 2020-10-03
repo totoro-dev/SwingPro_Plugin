@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import top.totoro.plugin.file.Log;
+import top.totoro.plugin.util.Log;
 
 import java.util.*;
 
