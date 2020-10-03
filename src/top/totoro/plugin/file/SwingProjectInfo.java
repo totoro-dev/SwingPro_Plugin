@@ -10,11 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SwingProjectInfo {
     private Project project;
+    private boolean closed = false; // 标志项目已经关闭，不需要继续扫描
     private final Map<String, String> waitToResolveTags = new HashMap<>();
     private final List<String> hasInitFiles = new LinkedList<>();
-    private static final Map<String, SwingProjectInfo> projects = new ConcurrentHashMap<>();
+    private final List<String> containProjectPathList = new ArrayList<>();
 
-    private List<String> containProjectPathList = new ArrayList<>();
+    private static final Map<String, SwingProjectInfo> projects = new ConcurrentHashMap<>();
 
     public static void setProject(Project project) {
         if (projects.get(project.getBasePath()) == null) {
@@ -26,7 +27,16 @@ public class SwingProjectInfo {
             ThreadPoolUtil.execute(swingProjectInfo::initCustomViewTag, 10000);
             // 间断性刷新R.java
             ThreadPoolUtil.execute(swingProjectInfo::scanResPackage, 5000);
-//            swingProjectInfo.scanResPackage();
+        }
+    }
+
+    public static void closedProject(Project project) {
+        SwingProjectInfo projectInfo = projects.get(project.getBasePath());
+        if (projectInfo != null) {
+            projects.remove(project.getBasePath());
+            projectInfo.closed = true;
+            projectInfo.hasInitFiles.clear();
+            projectInfo.containProjectPathList.clear();
         }
     }
 
@@ -75,6 +85,7 @@ public class SwingProjectInfo {
     }
 
     public void initCustomViewTag() {
+        if (closed) return;
         for (String projectPath : containProjectPathList) {
             String srcPath = projectPath + "/src/main/java";
             File srcDir = new File(srcPath);
@@ -111,6 +122,7 @@ public class SwingProjectInfo {
      * 扫描项目中的图片资源包、布局资源包，添加记录到R.java中
      */
     public void scanResPackage() {
+        if (closed) return;
         for (String projectPath : containProjectPathList) {
             SwingResGroupCreator.createMipmapGroup(projectPath);
             SwingResGroupCreator.createIdGroup(projectPath);
