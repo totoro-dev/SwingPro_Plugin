@@ -2,23 +2,19 @@ package top.totoro.plugin.file;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ui.configuration.ModulesConfigurator;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.ui.messages.MessagesService;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.util.EventDispatcher;
+import top.totoro.plugin.constant.AttributeKey;
+import top.totoro.plugin.core.SimpleCompletionContributor;
 import top.totoro.plugin.util.ThreadPoolUtil;
 
-import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.Thread.sleep;
 import static top.totoro.plugin.constant.Constants.DEFAULT_R_FILE_CONTENT;
 
 /**
@@ -87,6 +83,7 @@ public class SwingResGroupCreator {
         createMipmapGroup(projectPath, Arrays.asList(mipmapFiles));
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private static void createMipmapGroup(String projectPath, List<File> mipmapFiles) {
         Log.d(TAG, "createMipmapGroup() mipmap file size = " + mipmapFiles.size());
         try {
@@ -96,11 +93,14 @@ public class SwingResGroupCreator {
                 String originRFileContents = getRFileContent(RFile);
                 StringBuilder finalContents = new StringBuilder(originRFileContents);
                 String[] totals = originRFileContents.split(mipmapClassStartRegex);
+                String[] filesName = new String[mipmapFiles.size()];
+                int index = 0;
                 if (totals.length == 1) {
                     finalContents = new StringBuilder(totals[0].substring(0, totals[0].lastIndexOf("}")));
                     finalContents.append(mipmapClassStart);
                     for (File mipmapFile : mipmapFiles) {
                         String fileName = mipmapFile.getName();
+                        filesName[index++] = mipmapFile.getParentFile().getName() + "/" + fileName;
                         String field = mipmapFieldStart + fileName.substring(0, fileName.indexOf(".")) + "=\"" + fileName + "\";\n";
                         finalContents.append(field);
                     }
@@ -111,11 +111,13 @@ public class SwingResGroupCreator {
                     finalContents.append(mipmapClassStart);
                     for (File mipmapFile : mipmapFiles) {
                         String fileName = mipmapFile.getName();
+                        filesName[index++] = mipmapFile.getParentFile().getName() + "/" + fileName;
                         String field = mipmapFieldStart + fileName.substring(0, fileName.indexOf(".")) + "=\"" + fileName + "\";\n";
                         finalContents.append(field);
                     }
                     finalContents.append("\t}\n").append(anotherContent);
                 }
+                SimpleCompletionContributor.createValueLookupElement(AttributeKey.SRC, filesName);
                 if (finalContents.toString().equals(originRFileContents)) return;
                 setRFileContent(RFile, finalContents.toString());
             }

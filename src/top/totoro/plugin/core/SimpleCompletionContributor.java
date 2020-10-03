@@ -196,7 +196,7 @@ public class SimpleCompletionContributor extends CompletionContributor {
     }
 
     // 根据键入的属性key，创建属性可选的值
-    private static void createValueLookupElement(String key, String... values) {
+    public static void createValueLookupElement(String key, String... values) {
         for (String value : values) {
             valueLookupElements.add(LookupElementBuilder.create(value));
         }
