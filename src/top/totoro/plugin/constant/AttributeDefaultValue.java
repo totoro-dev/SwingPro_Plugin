@@ -18,9 +18,13 @@ public class AttributeDefaultValue {
     public static final String GONE = "gone";
     public static final String VISIBLE = "visible";
 
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+
     // 组件是否不透明
-    public static final String OPAQUE = "true"; // 不透明
-    public static final String NOT_OPAQUE = "false"; // 透明
+    public static final String OPAQUE = TRUE; // 不透明
+    public static final String NOT_OPAQUE = FALSE; // 透明
+
 
     // 字体
     public static final String SERIF = "serif";

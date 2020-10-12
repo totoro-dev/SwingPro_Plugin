@@ -44,6 +44,10 @@ public final class AttributeKey {
     public static final String switchOffKey = "switchOffIcon";
     public static final String isSwitchOnKey = "isSwitchOn";
 
+    public static final String selectedBoxIconKey = "selectedIcon";
+    public static final String unselectedBoxIconKey = "unselectedIcon";
+    public static final String isSelectedOnKey = "isSelected";
+
     public static final String column = "column";
 
     public static final String GRAVITY = "gravity";

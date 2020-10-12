@@ -126,7 +126,7 @@ public class SimpleCompletionContributor extends CompletionContributor {
 
     static {
         layoutTags = new LinkedList<>(Arrays.asList("CenterLayout", "FrameLayout", "GridLayout", "LinearLayout"));
-        viewTags = new LinkedList<>(Arrays.asList("Button", "EditText", "ImageButton", "ImageView",
+        viewTags = new LinkedList<>(Arrays.asList("Button", "CheckBox", "EditText", "ImageButton", "ImageView",
                 "RecyclerView", "Span", "Spinner", "SwitchButton", "TextView"));
         createTagLookElement();
 
@@ -137,6 +137,9 @@ public class SimpleCompletionContributor extends CompletionContributor {
                 AttributeKey.GAP, AttributeKey.GAP_VERTICAL, AttributeKey.GAP_HORIZONTAL);
         createKeyLookupElement("Button", AttributeKey.TEXT, AttributeKey.TEXT_SIZE, AttributeKey.TEXT_ALIGNMENT,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR);
+        createKeyLookupElement("CheckBox", AttributeKey.TEXT, AttributeKey.TEXT_SIZE, AttributeKey.TEXT_ALIGNMENT,
+                AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR,
+                AttributeKey.selectedBoxIconKey, AttributeKey.unselectedBoxIconKey, AttributeKey.isSelectedOnKey);
         createKeyLookupElement("EditText", AttributeKey.TEXT, AttributeKey.TEXT_SIZE,
                 AttributeKey.TEXT_STYLE, AttributeKey.TEXT_FONT, AttributeKey.TEXT_COLOR, AttributeKey.HINT_TEXT);
         createKeyLookupElement("ImageButton", AttributeKey.SRC);
@@ -153,6 +156,8 @@ public class SimpleCompletionContributor extends CompletionContributor {
         createValueLookupElement(AttributeKey.ORIENTATION, VERTICAL, HORIZONTAL);
         createValueLookupElement(AttributeKey.VISIBLE, VISIBLE, GONE);
         createValueLookupElement(AttributeKey.OPAQUE, OPAQUE, NOT_OPAQUE);
+        createValueLookupElement(AttributeKey.isSwitchOnKey, TRUE, FALSE);
+        createValueLookupElement(AttributeKey.isSelectedOnKey, TRUE, FALSE);
         createValueLookupElement(AttributeKey.TEXT_STYLE, SERIF, SANS_SERIF,
                 DIALOG, DIALOG_INPUT, MONOSPACED);
         createValueLookupElement(AttributeKey.TEXT_FONT, PLAIN, BOLD, ITALIC);

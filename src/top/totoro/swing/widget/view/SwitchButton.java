@@ -2,6 +2,7 @@ package top.totoro.swing.widget.view;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import top.totoro.swing.widget.base.BaseAttribute;
 import top.totoro.swing.widget.bean.ViewAttribute;
 import top.totoro.swing.widget.listener.OnSwitchChangedListener;
 
@@ -38,13 +39,18 @@ public class SwitchButton extends View<ViewAttribute, JLabel> {
     public void setIsSwitchOn(boolean isSwitchOn) {
         if (mIsSwitchOn == isSwitchOn) return;
         mIsSwitchOn = isSwitchOn;
+        attribute.getElement().setAttribute(isSwitchOnKey, String.valueOf(isSwitchOn));
         if (mIsSwitchOn) {
             component.setIcon(mSwitchOnIcon);
         } else {
             component.setIcon(mSwitchOffIcon);
         }
+        if (mOnSwitchChangedListener != null) {
+            mOnSwitchChangedListener.onSwitchChanged(attribute.getId(), mIsSwitchOn);
+        }
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public void setAttribute(ViewAttribute attribute) {
         super.setAttribute(attribute);
@@ -72,20 +78,49 @@ public class SwitchButton extends View<ViewAttribute, JLabel> {
         } else {
             component.setIcon(mSwitchOffIcon);
         }
+        reSizeAsImageSize();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (mIsSwitchOn) {
-            component.setIcon(mSwitchOffIcon);
-        } else {
-            component.setIcon(mSwitchOnIcon);
-        }
         mIsSwitchOn = !mIsSwitchOn;
+        attribute.getElement().setAttribute(isSwitchOnKey, String.valueOf(mIsSwitchOn));
+        if (mIsSwitchOn) {
+            component.setIcon(mSwitchOnIcon);
+        } else {
+            component.setIcon(mSwitchOffIcon);
+        }
         if (mOnSwitchChangedListener != null) {
             mOnSwitchChangedListener.onSwitchChanged(attribute.getId(), mIsSwitchOn);
         }
         super.mouseClicked(e);
+    }
+
+    /**
+     * 根据宽高属性的wrap或确定的值，重置图片大小
+     * 该方法一般在开始整体布局大小确定前调用
+     */
+    @SuppressWarnings("DuplicatedCode")
+    private void reSizeAsImageSize() {
+        int width, height;
+        if (mSwitchOnIcon == null) {
+            width = height = 0;
+        } else {
+            width = mSwitchOnIcon.getIconWidth();
+            height = mSwitchOnIcon.getIconHeight();
+        }
+        if (attribute.getWidth() == BaseAttribute.WRAP_CONTENT) {
+            setMinWidth(width);
+        }
+        if (attribute.getHeight() == BaseAttribute.WRAP_CONTENT) {
+            setMinHeight(height);
+        }
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        reSizeAsImageSize();
     }
 
     private OnSwitchChangedListener mOnSwitchChangedListener;

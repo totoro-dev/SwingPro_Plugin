@@ -165,6 +165,9 @@ public class AttributeUtil {
                 case GAP:
                 case GAP_VERTICAL:
                 case GAP_HORIZONTAL:
+                case selectedBoxIconKey:
+                case unselectedBoxIconKey:
+                case isSelectedOnKey:
                     /* 这些属性属于不同控件自有的，不需要在这里做初始化 */
                     return;
             }

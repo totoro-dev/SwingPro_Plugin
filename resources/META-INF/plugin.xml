@@ -1,12 +1,12 @@
 <idea-plugin>
     <id>top.totoro.plugin.SwingPro</id>
     <name>SwingPro</name>
-    <version>1.0.5</version>
+    <version>1.0.7</version>
     <vendor email="649676485@qq.com" url="http://totoro-dev.top">龙猫</vendor>
 
     <description>SwingPro插件帮助开发者结合SwingPro框架，快速创建SwingPro桌面应用</description>
 
-    <change-notes>v1.0.6 增加src属性中图片资源的代码提示；增加布局预览功能；升级SwingPro的依赖为1.0.6
+    <change-notes>v1.0.7 增加CheckBox控件的支持；升级SwingPro的依赖为1.0.7
     </change-notes>
 
     <idea-version since-build="193.0"/>
