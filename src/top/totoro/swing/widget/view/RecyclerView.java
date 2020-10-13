@@ -26,7 +26,7 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
     public static final int HORIZONTAL = 1, VERTICAL = 2;
     //    private JPanel parent; // 放置这个RecyclerView的容器
     //    private JPanel component; // 在这个RecyclerView中放置子控件的容器
-    private BaseLayout container = new BaseLayout(null);
+    private BaseLayout container = new BaseLayout(this);
     private LayoutAttribute containerAttribute = new LayoutAttribute();
     private BaseScrollBar.Vertical verticalScrollBar; // 垂直滚动条
     private BaseScrollBar.Horizontal horizontalScrollBar; // 水平滚动条
@@ -34,7 +34,7 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
     private Adapter adapter; // 这个RecyclerView持有的适配器
     /* 适配器对应的所有RecyclerView实例，用于在适配器的数据集发生改变时进行通知这些RecyclerView实例
      * 使用Weak的弱引用模式，确保在适配器不再有RecyclerView持有时，从映射关系中自动删除并GC*/
-    private static final WeakHashMap<Adapter, List<top.totoro.swing.widget.view.RecyclerView>> instances = new WeakHashMap<>();
+    private static final WeakHashMap<Adapter, List<RecyclerView>> instances = new WeakHashMap<>();
 
     private boolean mousePressing; // 鼠标是否按住
     private boolean shiftPressing; // Shift键是否按住
@@ -71,7 +71,7 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
     }
 
 
-    public static abstract class Adapter<ViewHolder extends top.totoro.swing.widget.view.RecyclerView.ViewHolder> {
+    public static abstract class Adapter<ViewHolder extends RecyclerView.ViewHolder> {
 
         public abstract ViewHolder onCreateViewHolder(BaseLayout parent);
 
@@ -87,9 +87,9 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
          * 如果正在浏览位置前的数据集数量不变，不改变正在浏览的位置。
          */
         public void notifyDataSetChange() {
-            List<top.totoro.swing.widget.view.RecyclerView> list = instances.get(this);
+            List<RecyclerView> list = instances.get(this);
             if (list == null || list.size() == 0) return;
-            for (top.totoro.swing.widget.view.RecyclerView instance : list) {
+            for (RecyclerView instance : list) {
                 if (instance == null) continue;
                 instance.setAdapter(this);
             }
@@ -100,9 +100,9 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
         }
     }
 
-    public void setAdapter(Adapter adapter) {
+    public void setAdapter(Adapter<? extends ViewHolder> adapter) {
         this.adapter = adapter;
-        List<top.totoro.swing.widget.view.RecyclerView> list = instances.get(adapter);
+        List<RecyclerView> list = instances.get(adapter);
         if (list == null) {
             list = new ArrayList<>();
             list.add(this);
@@ -139,7 +139,7 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
             /* remove end */
             /* add by HLM on 2020/7/26 解决鼠标等事件被ViewHolder中的view拦截问题 */
             // change by HLM on 2020/10/2 简化事件冒泡
-            item.getView().setParent(this);
+            item.getView().setParent(container);
             /* add end */
             adapter.onBindViewHolder(item, i, adapter.getViewType(i));
             container.addChildView(item.getView());
@@ -175,7 +175,7 @@ public class RecyclerView extends LinearLayout implements InvalidateListener {
 //            item.getView().setLayoutManager(layoutManager);
             /* add by HLM on 2020/7/26 解决鼠标等事件被ViewHolder中的view拦截问题 */
             // change by HLM on 2020/10/2 简化事件冒泡
-            item.getView().setParent(this);
+            item.getView().setParent(container);
             /* add end */
             adapter.onBindViewHolder(item, i, adapter.getViewType(i));
             container.addChildView(item.getView());

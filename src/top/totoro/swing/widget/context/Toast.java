@@ -33,8 +33,8 @@ public class Toast extends Dialog {
      *                       否则显示为文本内容
      * @return 可以显示的对话框
      */
-    public static top.totoro.swing.widget.context.Toast makeText(Context context, String textOrLayoutId) {
-        top.totoro.swing.widget.context.Toast toast = new top.totoro.swing.widget.context.Toast(context, false);
+    public static Toast makeText(Context context, String textOrLayoutId) {
+        Toast toast = new Toast(context, false);
         toast.context = context;
         URL url = context.getClass().getClassLoader().getResource("layout/" + textOrLayoutId);
         if (url == null) {
@@ -66,7 +66,7 @@ public class Toast extends Dialog {
      * @param toast 对话框
      * @param text  文本内容
      */
-    private static void initToastAsText(top.totoro.swing.widget.context.Toast toast, String text) {
+    private static void initToastAsText(Toast toast, String text) {
         toast.content = new ToastContent(toast.getMainView(), text);
         toast.mDialogWindow.add(toast.content.getComponent());
         toast.width = 30;

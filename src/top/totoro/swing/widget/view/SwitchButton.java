@@ -125,6 +125,11 @@ public class SwitchButton extends View<ViewAttribute, JLabel> {
 
     private OnSwitchChangedListener mOnSwitchChangedListener;
 
+    /**
+     * 设置开关状态变化的监听
+     *
+     * @param listener 监听器
+     */
     public void addOnSwitchChangedListener(OnSwitchChangedListener listener) {
         mOnSwitchChangedListener = listener;
     }

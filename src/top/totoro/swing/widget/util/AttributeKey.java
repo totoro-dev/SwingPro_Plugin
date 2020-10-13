@@ -11,6 +11,11 @@ public final class AttributeKey {
     public static final String SRC = "src";
     public static final String scaleType = "scaleType";
 
+    public static final String TOP_BORDER = "topBorder";
+    public static final String BOTTOM_BORDER = "bottomBorder";
+    public static final String LEFT_BORDER = "leftBorder";
+    public static final String RIGHT_BORDER = "rightBorder";
+
     public static final String MARGIN = "margin";
     public static final String MARGIN_LEFT = "marginLeft";
     public static final String MARGIN_RIGHT = "marginRight";

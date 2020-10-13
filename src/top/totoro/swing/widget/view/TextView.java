@@ -136,6 +136,11 @@ public class TextView extends View<ViewAttribute, JLabel> {
         invalidateSuper();
     }
 
+    /**
+     * 获取当前文本框中显示的文本内容
+     *
+     * @return 显示的文本内容
+     */
     public String getText() {
         if (component == null) return "";
         return component.getText();

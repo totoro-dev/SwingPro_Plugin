@@ -66,7 +66,7 @@ public class Intent {
 
     public synchronized Context getTargetContext() {
         if (targetContext == null) {
-            synchronized (top.totoro.swing.widget.context.Intent.class) {
+            synchronized (Intent.class) {
                 if (targetContext == null) {
                     try {
                         targetContext = targetContextClass.newInstance();

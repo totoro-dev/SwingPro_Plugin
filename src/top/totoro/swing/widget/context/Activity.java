@@ -45,7 +45,7 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
     private Location normalLocation;
     private Size normalSize;
     private boolean isOnRestart;
-    private top.totoro.swing.widget.context.Activity parentActivity;
+    private Activity parentActivity;
     private boolean isShowing = false;
 
     public Activity() {
@@ -58,8 +58,8 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         defaultActivityResizeMouseListener.setOnActivityResizeListener(resizeListener);
     }
 
-    public static top.totoro.swing.widget.context.Activity newInstance(Size size) {
-        top.totoro.swing.widget.context.Activity activity = new top.totoro.swing.widget.context.Activity();
+    public static Activity newInstance(Size size) {
+        Activity activity = new Activity();
         try {
             if (size != null) {
                 activity.setSize(size);
@@ -70,8 +70,8 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         return activity;
     }
 
-    public static top.totoro.swing.widget.context.Activity newInstance(Size size, Location location) {
-        top.totoro.swing.widget.context.Activity activity = new top.totoro.swing.widget.context.Activity();
+    public static Activity newInstance(Size size, Location location) {
+        Activity activity = new Activity();
         try {
             if (size != null) {
                 activity.setSize(size);
@@ -87,7 +87,6 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
 
     @Override
     public void dispatchMotionEvent(MotionEvent event) {
-        if (frame == null || !frame.isShowing()) return;
         super.dispatchMotionEvent(event);
         int x, y;
         switch (event.getAction()) {
@@ -124,7 +123,7 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         return isOnRestart;
     }
 
-    public void setParentActivity(top.totoro.swing.widget.context.Activity parentActivity) {
+    public void setParentActivity(Activity parentActivity) {
         Log.d(this, "setParentActivity = " + parentActivity);
         this.parentActivity = parentActivity;
     }
@@ -155,6 +154,9 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
                         && !(DialogManager.getTopDialog() instanceof Toast)
                         && DialogManager.getTopDialog().isShowing()) {
                     DialogManager.getTopDialog().hide(true);
+                }
+                if (PopupWindow.mShowingPopupWindow != null) {
+                    PopupWindow.mShowingPopupWindow.dismiss();
                 }
                 isShowing = false;
             } else if (state.getNewState() == 0) {
@@ -446,6 +448,9 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         if (View.mShowingSpinner != null) {
             View.mShowingSpinner.refreshLocation();
         }
+        if (PopupWindow.mShowingPopupWindow != null) {
+            PopupWindow.mShowingPopupWindow.refreshLocation();
+        }
     };
 
     /**
@@ -461,6 +466,9 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         /* add by HLM on 2020/7/26 解决显示中的下拉框跟随窗口移动的功能 */
         if (View.mShowingSpinner != null) {
             View.mShowingSpinner.refreshLocation();
+        }
+        if (PopupWindow.mShowingPopupWindow != null) {
+            PopupWindow.mShowingPopupWindow.refreshLocation();
         }
         /* add by HLM on 2020/8/29 解决显示中的dialog跟随窗口移动的功能 */
         if (DialogManager.getTopDialog() != null) {
@@ -556,6 +564,9 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         if (View.mShowingSpinner != null) {
             View.mShowingSpinner.dismiss();
         }
+        if (PopupWindow.mShowingPopupWindow != null) {
+            PopupWindow.mShowingPopupWindow.dismiss();
+        }
         frame.setExtendedState(JFrame.ICONIFIED);
     }
 
@@ -592,6 +603,9 @@ public class Activity extends Context implements OnActionBarClickListener, OnAct
         /* add by HLM on 2020/7/27 解决显示中的下拉框在窗体销毁时的隐藏功能 */
         if (View.mShowingSpinner != null) {
             View.mShowingSpinner.dismiss();
+        }
+        if (PopupWindow.mShowingPopupWindow != null) {
+            PopupWindow.mShowingPopupWindow.dismiss();
         }
         finish();
     }

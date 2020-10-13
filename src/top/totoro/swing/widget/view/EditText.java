@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 编辑框
  */
-public class EditText extends View<ViewAttribute, JTextArea> {
+public class EditText extends View<ViewAttribute, JTextField> {
 
     private OnTextChangeListener onTextChangeListener;
     private String origin = "";
@@ -20,12 +20,9 @@ public class EditText extends View<ViewAttribute, JTextArea> {
 
     public EditText(View parent) {
         super(parent);
-        component = new JTextArea();
-        if (isPlugin) {
-            component.setFocusable(false);
-        }
+        component = new JTextField();
         // 设置制表符占位数
-        component.setTabSize(4);
+//        component.setTabSize(4);
         component.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -99,6 +96,11 @@ public class EditText extends View<ViewAttribute, JTextArea> {
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, attribute.getBorderColor()));
     }
 
+    /**
+     * 设置提示语
+     *
+     * @param hint 提示语
+     */
     public void setHint(String hint) {
         // change by HLM on 2020/9/26 只有当前编辑框没有内容时才显示hint
         if (getText().equals("")) {
@@ -110,6 +112,11 @@ public class EditText extends View<ViewAttribute, JTextArea> {
         attribute.setHintText(hint);
     }
 
+    /**
+     * 设置编辑框文本内容
+     *
+     * @param text 文本内容
+     */
     public void setText(String text) {
         if (text == null || "".equals(text)) {
             setHint(attribute.getHintText());
@@ -157,6 +164,12 @@ public class EditText extends View<ViewAttribute, JTextArea> {
         setMinHeight(minHeight);
     }
 
+    /**
+     * 设置编辑框文本内容变化监听，
+     * 文本发生变化的1秒钟内会触发。
+     *
+     * @param listener 监听器
+     */
     public void addOnTextChangeListener(OnTextChangeListener listener) {
         onTextChangeListener = listener;
         origin = getText();

@@ -115,6 +115,17 @@ public class SimpleCompletionContributor extends CompletionContributor {
                 start = editor.offsetToLogicalPosition(tailOffset + 1);
                 end = editor.offsetToLogicalPosition(tailOffset + WHITE_COLOR.length());
                 break;
+            case AttributeKey.TOP_BORDER:
+            case AttributeKey.BOTTOM_BORDER:
+            case AttributeKey.LEFT_BORDER:
+            case AttributeKey.RIGHT_BORDER:
+                document.insertString(tailOffset, "1\"");
+                // 将光标移动到数字之后
+                editor.getCaretModel().moveToOffset(tailOffset + 1);
+                // 背景颜色从#符号之后开始选中（数字部分）
+                start = editor.offsetToLogicalPosition(tailOffset);
+                end = editor.offsetToLogicalPosition(tailOffset + 1);
+                break;
         }
         if (end == null) {
             document.insertString(tailOffset, "\"");
@@ -196,6 +207,10 @@ public class SimpleCompletionContributor extends CompletionContributor {
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_RIGHT).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_TOP).withInsertHandler(keyInsertHandler));
         keyLookupElements.add(LookupElementBuilder.create(AttributeKey.MARGIN_BOTTOM).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.TOP_BORDER).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.BOTTOM_BORDER).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.LEFT_BORDER).withInsertHandler(keyInsertHandler));
+        keyLookupElements.add(LookupElementBuilder.create(AttributeKey.RIGHT_BORDER).withInsertHandler(keyInsertHandler));
         tagKeysMap.put(tag, new LinkedList<>(keyLookupElements));
         keyLookupElements.clear();
     }

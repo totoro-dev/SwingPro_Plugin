@@ -3,6 +3,7 @@ package top.totoro.swing.widget.view;
 import top.totoro.swing.widget.base.BaseAttribute;
 import top.totoro.swing.widget.bean.ViewAttribute;
 import top.totoro.swing.widget.context.Context;
+import top.totoro.swing.widget.context.PopupWindow;
 import top.totoro.swing.widget.event.MotionEvent;
 import top.totoro.swing.widget.listener.OnClickListener;
 import top.totoro.swing.widget.manager.LayoutManager;
@@ -26,7 +27,7 @@ public class View<Attribute extends BaseAttribute, Component extends JComponent>
     private int minHeight = 0;
 
     private View parent;
-    private top.totoro.swing.widget.view.View<?, ?> preView; // 这个View的前一个View，用来处理margin属性
+    private View<?, ?> preView; // 这个View的前一个View，用来处理margin属性
     private String parentId = "";
     private LinkedList<View> sonViews = new LinkedList<>();
     private Map<String, View> containViewsById = new ConcurrentHashMap<>();
@@ -48,11 +49,11 @@ public class View<Attribute extends BaseAttribute, Component extends JComponent>
         }
     }
 
-    public top.totoro.swing.widget.view.View<?, ?> getPreView() {
+    public View<?, ?> getPreView() {
         return preView;
     }
 
-    public void setPreView(top.totoro.swing.widget.view.View<?, ?> preView) {
+    public void setPreView(View<?, ?> preView) {
         this.preView = preView;
     }
 
@@ -285,6 +286,9 @@ public class View<Attribute extends BaseAttribute, Component extends JComponent>
     public void mouseClicked(MouseEvent e) {
         if (mShowingSpinner != null && !(this instanceof Spinner)) {
             mShowingSpinner.dismiss();
+        }
+        if (PopupWindow.mShowingPopupWindow != null) {
+            PopupWindow.mShowingPopupWindow.dismiss();
         }
         if (listenClickEvent) {
             clickListener.onClick(this);

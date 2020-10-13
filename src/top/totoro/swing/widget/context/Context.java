@@ -43,7 +43,7 @@ public class Context implements ContextWrapper {
      * @param context 指定上下文
      * @param target  activity界面
      */
-    public void startActivity(@NotNull top.totoro.swing.widget.context.Context context, Class<? extends Activity> target) {
+    public void startActivity(@NotNull Context context, Class<? extends Activity> target) {
         Activity activity = ActivityManager.getOrCreateActivity(target);
         ActivityManager.setTopActivity(activity);
         if (context instanceof Activity) {
