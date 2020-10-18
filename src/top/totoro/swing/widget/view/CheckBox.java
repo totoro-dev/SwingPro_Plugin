@@ -114,7 +114,7 @@ public class CheckBox extends View<ViewAttribute, JPanel> {
             txtX = unselectedImg.getIconWidth();
             boxImgLabel.setBounds(imgX, imgY, unselectedImg.getIconWidth(), unselectedImg.getIconHeight());
         }
-        boxTextLabel.setBounds(txtX, txtY, getWidth() - boxImgLabel.getWidth(), getHeight());
+        boxTextLabel.setBounds(txtX, txtY, getMinWidth() - boxImgLabel.getWidth(), getHeight());
     }
 
     /**
